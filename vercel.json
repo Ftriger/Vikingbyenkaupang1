@@ -1,11 +1,5 @@
 {
   "version": 2,
-  "routes": [
-    {
-      "src": "/(?!.*\\.(?:jpg|jpeg|png|gif|webp|svg|ico|css|js|txt|xml|json)$)(.*)",
-      "dest": "/index.html"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",

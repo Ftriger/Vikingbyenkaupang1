@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kaupang Vikingby – Trå inn i historien | Larvik, Vestfold</title>
+
+  <!-- SEO Meta -->
+  <meta name="description" content="Kaupang Vikingby i Larvik inviterer deg til å oppleve ekte vikingtid. Besøk Norges første by med guidede omvisninger, smiing, bueskyting, markeder og levende historie. Åpent sommer 2025." />
+  <meta name="keywords" content="Kaupang vikingby, vikingmuseum Larvik, vikingtid Norge, vikingopplevelse, smiing kurs, bueskyting viking, Vestfold museum, historisk formidling, Kaupangveien Larvik" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Kaupangprosjektet" />
+  <link rel="canonical" href="https://kaupangvikingby.no/" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://kaupangvikingby.no/" />
+  <meta property="og:title" content="Kaupang Vikingby – Trå inn i historien" />
+  <meta property="og:description" content="Opplev Norges første by slik den en gang var. Guidede turer, håndverk, bueskyting og autentisk vikingmat i Larvik." />
+  <meta property="og:image" content="https://kaupangvikingby.no/og-image.jpg" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Kaupang Vikingby – Trå inn i historien" />
+  <meta name="twitter:description" content="Opplev ekte vikingtid i Larvik. Smiing, bueskyting, omvisninger og markeder på historisk grunn." />
+
+  <!-- Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TouristAttraction",
+    "name": "Kaupang Vikingby",
+    "description": "Norges første by gjenskapt som levende vikingmuseum med håndverk, omvisninger og aktiviteter.",
+    "url": "https://kaupangvikingby.no",
+    "telephone": "+4790622744",
+    "email": "post@kaupangprosjektet.no",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Kaupangveien 276",
+      "addressLocality": "Larvik",
+      "postalCode": "3261",
+      "addressCountry": "NO"
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+      "opens": "10:00",
+      "closes": "17:00",
+      "validFrom": "2025-06-24",
+      "validThrough": "2025-08-30"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 59.0714,
+      "longitude": 10.1834
+    },
+    "sameAs": ["https://www.facebook.com/profile.php?id=6156069640471810"]
+  }
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ore: #2C1A0E;
+      --ore-mid: #5C3A1E;
+      --forge: #8B4513;
+      --ember: #C8692A;
+      --flame: #E8942A;
+      --gold: #D4A853;
+      --parchment: #F5EDD8;
+      --parchment-deep: #EDE0C4;
+      --ash: #9A8F82;
+      --smoke: #6B5F55;
+      --rune-dark: #1A1008;
+      --iron: #3D3530;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-weight: 400;
+      font-size: 18px;
+      color: var(--ore);
+      background: var(--parchment);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2.5rem;
+      height: 72px;
+      background: rgba(28, 16, 6, 0.92);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid rgba(212, 168, 83, 0.2);
+      transition: background 0.3s;
+    }
+
+    .nav-logo {
+      font-family: 'Cinzel', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--gold);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-logo svg { width: 28px; height: 28px; }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--parchment);
+      text-decoration: none;
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      opacity: 0.85;
+      transition: opacity 0.2s, color 0.2s;
+    }
+
+    .nav-links a:hover { opacity: 1; color: var(--gold); }
+
+    .nav-cta {
+      background: var(--ember);
+      color: var(--parchment) !important;
+      padding: 0.5rem 1.25rem;
+      border-radius: 2px;
+      opacity: 1 !important;
+      transition: background 0.2s !important;
+    }
+
+    .nav-cta:hover { background: var(--flame) !important; }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--gold);
+      transition: transform 0.3s, opacity 0.3s;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 2rem 80px;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(10,5,0,0.55) 0%, rgba(28,16,6,0.75) 60%, rgba(28,16,6,0.95) 100%),
+        url('https://images.unsplash.com/photo-1580048915913-4f8f5cb481c4?w=1600&q=80&fit=crop') center/cover no-repeat;
+    }
+
+    .hero-texture {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='80' height='80' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.4;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 780px;
+    }
+
+    .hero-rune {
+      display: block;
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 2rem;
+      opacity: 0.6;
+    }
+
+    .hero-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.25rem;
+      display: block;
+    }
+
+    .hero h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      font-weight: 700;
+      color: var(--parchment);
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    }
+
+    .hero-sub {
+      font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+      color: rgba(245, 237, 216, 0.82);
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: var(--ember);
+      color: var(--parchment);
+      border: none;
+      padding: 0.9rem 2rem;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.15s;
+      display: inline-block;
+    }
+
+    .btn-primary:hover { background: var(--flame); transform: translateY(-1px); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--parchment);
+      border: 1px solid rgba(245, 237, 216, 0.5);
+      padding: 0.9rem 2rem;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: border-color 0.25s, color 0.25s, transform 0.15s;
+      display: inline-block;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      transform: translateY(-1px);
+    }
+
+    .hero-scroll {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: rgba(245,237,216,0.4);
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    .hero-scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, rgba(245,237,216,0.4), transparent);
+      animation: scrollDown 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollDown {
+      0%, 100% { transform: scaleY(1); opacity: 0.4; }
+      50% { transform: scaleY(0.5); opacity: 0.15; }
+    }
+
+    /* ── SECTION COMMON ── */
+    section { padding: 6rem 2rem; }
+
+    .container { max-width: 1080px; margin: 0 auto; }
+
+    .section-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--ember);
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 600;
+      color: var(--ore);
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+    }
+
+    .divider {
+      width: 60px;
+      height: 2px;
+      background: var(--gold);
+      margin: 1.5rem 0 2rem;
+    }
+
+    .divider-center { margin: 1.5rem auto 2rem; }
+
+    /* ── ABOUT ── */
+    #om {
+      background: var(--ore);
+      color: var(--parchment);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #om::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -60px;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200,105,42,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    #om .section-title { color: var(--parchment); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: center;
+    }
+
+    .about-text p {
+      font-size: 1.12rem;
+      line-height: 1.85;
+      color: rgba(245,237,216,0.85);
+      margin-bottom: 1.25rem;
+    }
+
+    .about-text p strong { color: var(--gold); font-weight: 600; }
+
+    .about-quote {
+      border-left: 3px solid var(--ember);
+      padding-left: 1.5rem;
+      margin: 2rem 0;
+      font-style: italic;
+      font-size: 1.15rem;
+      color: rgba(245,237,216,0.75);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .about-image-stack {
+      position: relative;
+    }
+
+    .about-img-main {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      filter: sepia(20%) contrast(1.05);
+      border: 1px solid rgba(212,168,83,0.2);
+    }
+
+    .about-img-accent {
+      position: absolute;
+      bottom: -2rem;
+      right: -2rem;
+      width: 55%;
+      aspect-ratio: 4/3;
+      object-fit: cover;
+      filter: sepia(20%) contrast(1.05);
+      border: 4px solid var(--ore);
+      outline: 1px solid rgba(212,168,83,0.25);
+    }
+
+    .about-facts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .fact-item {
+      border-top: 1px solid rgba(212,168,83,0.25);
+      padding-top: 1rem;
+    }
+
+    .fact-num {
+      font-family: 'Cinzel', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--gold);
+      display: block;
+    }
+
+    .fact-label {
+      font-size: 0.85rem;
+      color: rgba(245,237,216,0.55);
+      letter-spacing: 0.05em;
+    }
+
+    /* ── ACTIVITIES ── */
+    #aktiviteter {
+      background: var(--parchment-deep);
+    }
+
+    .activities-header { text-align: center; margin-bottom: 4rem; }
+
+    .activities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2px;
+    }
+
+    .activity-card {
+      background: var(--parchment);
+      padding: 2.5rem 2rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: default;
+    }
+
+    .activity-card::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--ember);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s;
+    }
+
+    .activity-card:hover::before { transform: scaleX(1); }
+    .activity-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(28,16,6,0.12); }
+
+    .activity-icon {
+      width: 52px;
+      height: 52px;
+      margin-bottom: 1.5rem;
+      color: var(--ember);
+    }
+
+    .activity-card h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--ore);
+      margin-bottom: 0.75rem;
+    }
+
+    .activity-card p {
+      font-size: 0.97rem;
+      line-height: 1.7;
+      color: var(--smoke);
+    }
+
+    .activity-tag {
+      display: inline-block;
+      margin-top: 1rem;
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ember);
+      border: 1px solid var(--ember);
+      padding: 0.25rem 0.6rem;
+    }
+
+    /* ── EVENTS BANNER ── */
+    .events-banner {
+      background: var(--forge);
+      padding: 5rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .events-banner::before {
+      content: 'ᚱᚢᚾᛖ';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18rem;
+      color: rgba(255,255,255,0.03);
+      letter-spacing: 0.3em;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .events-banner .section-label { color: var(--gold); }
+    .events-banner .section-title { color: var(--parchment); }
+
+    .events-row {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 2.5rem;
+    }
+
+    .event-chip {
+      background: rgba(245,237,216,0.1);
+      border: 1px solid rgba(212,168,83,0.3);
+      color: var(--parchment);
+      padding: 0.75rem 1.5rem;
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      transition: background 0.2s;
+    }
+
+    .event-chip:hover { background: rgba(245,237,216,0.18); }
+
+    /* ── GALLERY ── */
+    #galleri {
+      background: var(--ore);
+      padding: 5rem 0;
+    }
+
+    #galleri .container { padding: 0 2rem; }
+
+    .gallery-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 0 2rem;
+    }
+
+    .gallery-header .section-title { color: var(--parchment); }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: auto;
+      gap: 4px;
+    }
+
+    .gallery-item {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: sepia(15%) contrast(1.05) brightness(0.95);
+      transition: transform 0.6s, filter 0.4s;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.04);
+      filter: sepia(5%) contrast(1.08) brightness(1.02);
+    }
+
+    .gi-1 { grid-column: 1 / 6; grid-row: 1; aspect-ratio: 4/3; }
+    .gi-2 { grid-column: 6 / 9; grid-row: 1; aspect-ratio: 3/4; }
+    .gi-3 { grid-column: 9 / 13; grid-row: 1; aspect-ratio: 4/3; }
+    .gi-4 { grid-column: 1 / 4; grid-row: 2; aspect-ratio: 4/3; }
+    .gi-5 { grid-column: 4 / 9; grid-row: 2; aspect-ratio: 16/9; }
+    .gi-6 { grid-column: 9 / 13; grid-row: 2; aspect-ratio: 4/3; }
+
+    /* ── PRACTICAL ── */
+    #praktisk {
+      background: var(--parchment);
+    }
+
+    .practical-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: start;
+    }
+
+    .info-block { margin-bottom: 2.5rem; }
+
+    .info-block h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--ore);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .info-block h3 svg {
+      width: 20px;
+      height: 20px;
+      color: var(--ember);
+      flex-shrink: 0;
+    }
+
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.97rem;
+    }
+
+    .info-table tr { border-bottom: 1px solid rgba(92,58,30,0.12); }
+    .info-table tr:last-child { border-bottom: none; }
+
+    .info-table td {
+      padding: 0.6rem 0;
+      color: var(--smoke);
+      line-height: 1.5;
+    }
+
+    .info-table td:first-child {
+      font-weight: 600;
+      color: var(--ore);
+      width: 40%;
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.03em;
+    }
+
+    .ticket-card {
+      background: var(--ore);
+      color: var(--parchment);
+      padding: 2rem;
+      margin-bottom: 1px;
+    }
+
+    .ticket-card:nth-child(2) { background: var(--ore-mid); }
+    .ticket-card:nth-child(3) { background: var(--forge); }
+
+    .ticket-type {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .ticket-price {
+      font-family: 'Cinzel', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--parchment);
+    }
+
+    .ticket-desc {
+      font-size: 0.9rem;
+      color: rgba(245,237,216,0.6);
+      margin-top: 0.3rem;
+    }
+
+    .map-embed {
+      width: 100%;
+      height: 260px;
+      border: none;
+      filter: sepia(30%) contrast(0.9);
+      margin-top: 1rem;
+    }
+
+    /* ── CONTACT ── */
+    #kontakt {
+      background: var(--rune-dark);
+      color: var(--parchment);
+      text-align: center;
+      padding: 6rem 2rem;
+    }
+
+    #kontakt .section-title { color: var(--parchment); }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .contact-item {
+      border: 1px solid rgba(212,168,83,0.15);
+      padding: 2rem 1.5rem;
+      transition: border-color 0.25s;
+    }
+
+    .contact-item:hover { border-color: rgba(212,168,83,0.4); }
+
+    .contact-item svg {
+      width: 28px;
+      height: 28px;
+      color: var(--gold);
+      margin-bottom: 1rem;
+    }
+
+    .contact-item h4 {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ash);
+      margin-bottom: 0.5rem;
+    }
+
+    .contact-item p, .contact-item a {
+      font-size: 0.97rem;
+      color: rgba(245,237,216,0.75);
+      text-decoration: none;
+      line-height: 1.5;
+    }
+
+    .contact-item a:hover { color: var(--gold); }
+
+    .social-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 3rem;
+    }
+
+    .social-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: rgba(245,237,216,0.06);
+      border: 1px solid rgba(212,168,83,0.2);
+      color: var(--parchment);
+      text-decoration: none;
+      padding: 0.7rem 1.4rem;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .social-btn:hover {
+      background: rgba(245,237,216,0.12);
+      border-color: rgba(212,168,83,0.45);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--rune-dark);
+      border-top: 1px solid rgba(212,168,83,0.1);
+      padding: 2rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: rgba(245,237,216,0.3);
+      font-family: 'Cinzel', serif;
+      letter-spacing: 0.05em;
+    }
+
+    footer a { color: rgba(245,237,216,0.4); text-decoration: none; }
+    footer a:hover { color: var(--gold); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 1.25rem; }
+      .nav-links { display: none; flex-direction: column; position: fixed; top: 72px; left: 0; right: 0; background: rgba(28,16,6,0.97); padding: 2rem 1.5rem; gap: 1.5rem; border-top: 1px solid rgba(212,168,83,0.15); }
+      .nav-links.open { display: flex; }
+      .hamburger { display: flex; }
+      .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .about-image-stack { display: none; }
+      .practical-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; }
+      .gi-1, .gi-2, .gi-3, .gi-4, .gi-5, .gi-6 { grid-column: auto; grid-row: auto; aspect-ratio: 4/3; }
+      section { padding: 4rem 1.25rem; }
+      .about-facts { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ── ANIMATIONS ── */
+    [data-reveal] {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    [data-reveal].visible {
+      opacity: 1;
+      transform: none;
+    }
+    [data-reveal-delay="1"] { transition-delay: 0.15s; }
+    [data-reveal-delay="2"] { transition-delay: 0.3s; }
+    [data-reveal-delay="3"] { transition-delay: 0.45s; }
+    [data-reveal-delay="4"] { transition-delay: 0.6s; }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVIGATION ── -->
+<nav id="navbar">
+  <a href="#" class="nav-logo" aria-label="Kaupang Vikingby">
+    <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M14 2L3 10v16h8v-8h6v8h8V10L14 2z" stroke="#D4A853" stroke-width="1.5" stroke-linejoin="round"/>
+      <line x1="14" y1="2" x2="14" y2="26" stroke="#D4A853" stroke-width="1"/>
+      <circle cx="14" cy="14" r="2" fill="#D4A853"/>
+    </svg>
+    Kaupang Vikingby
+  </a>
+
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#om">Om oss</a></li>
+    <li><a href="#aktiviteter">Aktiviteter</a></li>
+    <li><a href="#galleri">Galleri</a></li>
+    <li><a href="#praktisk">Praktisk</a></li>
+    <li><a href="#kontakt" class="nav-cta">Kontakt</a></li>
+  </ul>
+
+  <button class="hamburger" id="hamburger" aria-label="Åpne meny" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero" id="topp">
+  <div class="hero-bg" role="img" aria-label="Vikingby i skumring"></div>
+  <div class="hero-texture" aria-hidden="true"></div>
+
+  <div class="hero-content">
+    <svg class="hero-rune" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="30" cy="30" r="28" stroke="#D4A853" stroke-width="1"/>
+      <line x1="30" y1="4" x2="30" y2="56" stroke="#D4A853" stroke-width="1"/>
+      <line x1="4" y1="30" x2="56" y2="30" stroke="#D4A853" stroke-width="1"/>
+      <line x1="10" y1="10" x2="50" y2="50" stroke="#D4A853" stroke-width="0.75"/>
+      <line x1="50" y1="10" x2="10" y2="50" stroke="#D4A853" stroke-width="0.75"/>
+      <circle cx="30" cy="30" r="4" fill="#D4A853"/>
+    </svg>
+
+    <span class="hero-label">Norges første by · Kaupangveien 276, Larvik</span>
+    <h1>Trå inn i historien hos Kaupang Vikingby</h1>
+    <p class="hero-sub">
+      Opplev ekte vikingtid gjennom levende historie, tradisjonelt håndverk<br>
+      og fellesskap på historisk grunn ved Viksfjorden.
+    </p>
+
+    <div class="hero-btns">
+      <a href="#praktisk" class="btn-primary">Planlegg ditt besøk</a>
+      <a href="#aktiviteter" class="btn-outline">Se aktiviteter</a>
+    </div>
+  </div>
+
+  <div class="hero-scroll" aria-hidden="true">
+    <div class="hero-scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ── OM OSS ── -->
+<section id="om">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-text">
+        <span class="section-label" data-reveal>Vår historie</span>
+        <h2 class="section-title" data-reveal data-reveal-delay="1">Ikke et museum — en levende by</h2>
+        <div class="divider" data-reveal data-reveal-delay="2"></div>
+
+        <div data-reveal data-reveal-delay="2">
+          <p>I Kaupang Vikingby tier ikke historien. Her lukter det bålrøyk og tjære, og lyden av øks mot treverk minner oss om våre røtter. Vi inviterer deg til å legge hverdagen bak deg og bli en del av vårt langhusfellesskap.</p>
+
+          <blockquote class="about-quote">
+            "Kaupang ble grunnlagt ca. år 800 som et knutepunkt for handel, håndverk og menneskemøter — Norges første by."
+          </blockquote>
+
+          <p>Kaupangprosjektet har siden sine tidlige år arbeidet for å gi denne historiske plassen nytt liv. Vi formidler vikingtidens <strong>dagligliv, tro og håndverkstradisjoner</strong> gjennom levende demonstrasjoner, guider kledd i autentiske drakter og håndverk utøvd med datidens redskaper.</p>
+
+          <p>Dette er ingen rekonstruksjon av krig og slag. Her møter du smedene, tekstilarbeiderne, perlemakerne og kjøpmennene som bygde en av Skandinavias viktigste tidlige byer.</p>
+        </div>
+
+        <div class="about-facts" data-reveal data-reveal-delay="3">
+          <div class="fact-item">
+            <span class="fact-num">år 800</span>
+            <span class="fact-label">Kaupang grunnlagt</span>
+          </div>
+          <div class="fact-item">
+            <span class="fact-num">100 000+</span>
+            <span class="fact-label">arkeologiske funn</span>
+          </div>
+          <div class="fact-item">
+            <span class="fact-num">1 200</span>
+            <span class="fact-label">år med historie</span>
+          </div>
+          <div class="fact-item">
+            <span class="fact-num">daglig</span>
+            <span class="fact-label">guidede omvisninger</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="about-image-stack" data-reveal data-reveal-delay="2" aria-hidden="true">
+        <img
+          class="about-img-main"
+          src="https://images.unsplash.com/photo-1563465827-e8adec6a7cdf?w=600&q=80&fit=crop"
+          alt="Håndverker i aksjon med tradisjonelt verktøy"
+          loading="lazy"
+        />
+        <img
+          class="about-img-accent"
+          src="https://images.unsplash.com/photo-1592965462-0f0b8b2d88a7?w=400&q=80&fit=crop"
+          alt="Detalj fra vikingtidens håndverk"
+          loading="lazy"
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ACTIVITIES ── -->
+<section id="aktiviteter">
+  <div class="container">
+    <div class="activities-header">
+      <span class="section-label" data-reveal>Opplevelser</span>
+      <h2 class="section-title" data-reveal data-reveal-delay="1">Hva venter deg i Kaupang</h2>
+      <div class="divider divider-center" data-reveal data-reveal-delay="2"></div>
+    </div>
+
+    <div class="activities-grid">
+      <!-- Smiing -->
+      <div class="activity-card" data-reveal>
+        <svg class="activity-icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M10 42L32 20M32 20l4-8 8-4-4 8-8 4zM10 42l6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="38" cy="14" r="3" fill="currentColor" opacity="0.4"/>
+          <path d="M8 44l2-2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+        <h3>Smiing og metallhåndverk</h3>
+        <p>Kjenn varmen fra esset og lær å forme jern med hammer og ambolt, slik vikingenes smeder gjorde det i over tusen år. Smien er åpen og aktiv gjennom hele sesongen.</p>
+        <span class="activity-tag">Kurs tilgjengelig</span>
+      </div>
+
+      <!-- Bueskyting -->
+      <div class="activity-card" data-reveal data-reveal-delay="1">
+        <svg class="activity-icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 40C12 40 20 8 40 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="12" y1="40" x2="40" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="3 3"/>
+          <circle cx="42" cy="10" r="3" fill="currentColor"/>
+          <path d="M6 46l8-8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <h3>Bueskyting</h3>
+        <p>Prøv datidens pil og bue under kyndig veiledning. En aktivitet for hele familien som gir deg en umiddelbar følelse av vikingtiden.</p>
+        <span class="activity-tag">For alle aldre</span>
+      </div>
+
+      <!-- Tekstil -->
+      <div class="activity-card" data-reveal data-reveal-delay="2">
+        <svg class="activity-icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <rect x="8" y="10" width="36" height="32" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="16" y1="10" x2="16" y2="42" stroke="currentColor" stroke-width="1"/>
+          <line x1="24" y1="10" x2="24" y2="42" stroke="currentColor" stroke-width="1"/>
+          <line x1="32" y1="10" x2="32" y2="42" stroke="currentColor" stroke-width="1"/>
+          <line x1="8" y1="18" x2="44" y2="18" stroke="currentColor" stroke-width="1"/>
+          <line x1="8" y1="26" x2="44" y2="26" stroke="currentColor" stroke-width="1"/>
+          <line x1="8" y1="34" x2="44" y2="34" stroke="currentColor" stroke-width="1"/>
+        </svg>
+        <h3>Tekstilarbeid og veving</h3>
+        <p>Fra spinnehjul til vev — lær håndverkene som kledde en hel sivilisasjon. Kursdeltakere tar med seg kunnskap og ferdigheter hjem.</p>
+        <span class="activity-tag">Kurs tilgjengelig</span>
+      </div>
+
+      <!-- Treutskjæring -->
+      <div class="activity-card" data-reveal data-reveal-delay="3">
+        <svg class="activity-icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M26 8v36M14 14l12 12M38 14L26 26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M10 38c0 0 8-2 16-2s16 2 16 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="26" cy="26" r="4" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <h3>Treutskjæring</h3>
+        <p>Kniv mot tre — den eldste av kunstformer. Under kyndige henders veiledning skaper du dine egne vikingeinspirerte motiver i tradisjonelt norsk tre.</p>
+        <span class="activity-tag">Kurs tilgjengelig</span>
+      </div>
+
+      <!-- Skolebesøk -->
+      <div class="activity-card" data-reveal>
+        <svg class="activity-icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M10 14h32v28H10z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M10 14L26 6l16 8" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <rect x="20" y="28" width="12" height="14" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="26" y1="14" x2="26" y2="28" stroke="currentColor" stroke-width="1"/>
+        </svg>
+        <h3>Skolebesøk og pedagogiske opplegg</h3>
+        <p>Skreddersydde program for barnehager og skoleklasser. Elevene deltar aktivt i arkeologisk utgraving, markedshandel og vikinglivets mange gjøremål.</p>
+        <span class="activity-tag">Grupper</span>
+      </div>
+
+      <!-- Omvisning -->
+      <div class="activity-card" data-reveal data-reveal-delay="1">
+        <svg class="activity-icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="26" cy="22" r="10" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M26 32v14M20 44h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="26" cy="22" r="3" fill="currentColor" opacity="0.5"/>
+          <path d="M26 16v-4M26 28v4M18 22h-4M34 22h4" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+        <h3>Guidede omvisninger</h3>
+        <p>Guider i autentiske vikingdrakter tar deg bak kulissene i langhusene, gjennom gravfeltet og inn i vikingens hverdag. Omvisninger daglig i åpningstiden.</p>
+        <span class="activity-tag">Daglig</span>
+      </div>
+
+      <!-- Markeder -->
+      <div class="activity-card" data-reveal data-reveal-delay="2">
+        <svg class="activity-icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M8 20h36v-4l-6-10H14L8 16v4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <rect x="8" y="20" width="36" height="22" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="8" y1="20" x2="8" y2="42" stroke="currentColor" stroke-width="1.5"/>
+          <line x1="26" y1="20" x2="26" y2="42" stroke="currentColor" stroke-width="1"/>
+          <path d="M14 30h8M30 30h8" stroke="currentColor" stroke-width="1" stroke-linecap="round"/>
+        </svg>
+        <h3>Markeder og gilder</h3>
+        <p>Gjennom sesongen arrangeres spesielle markedsdager med handel, vikingmat over åpen ild, musikk og underholdning. Et møtested slik det alltid har vært.</p>
+        <span class="activity-tag">Sesongprogram</span>
+      </div>
+
+      <!-- Foredrag -->
+      <div class="activity-card" data-reveal data-reveal-delay="3">
+        <svg class="activity-icon" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="26" cy="16" r="8" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M12 44c0-8 6-14 14-14s14 6 14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M36 26l4 4M36 30l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <h3>Foredrag med fagfolk</h3>
+        <p>Arkeologer, historikere og tradisjonsbærere holder jevnlige foredrag om Kaupangs unike plass i norsk og europeisk historie. Kunnskapen følger deg hjem.</p>
+        <span class="activity-tag">Program varierer</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── EVENTS BANNER ── -->
+<div class="events-banner">
+  <div class="container">
+    <span class="section-label" data-reveal>Høydepunkter 2025</span>
+    <h2 class="section-title" data-reveal data-reveal-delay="1">Spesielle arrangementer</h2>
+    <p style="color: rgba(245,237,216,0.65); max-width: 480px; margin: 0 auto; font-style: italic;" data-reveal data-reveal-delay="2">
+      Gjennom sesongen arrangeres det temadager, gilder og spesialeventer.
+      Følg med på Facebook for siste oppdateringer.
+    </p>
+    <div class="events-row" data-reveal data-reveal-delay="3">
+      <span class="event-chip">Onsdag: Familiedager</span>
+      <span class="event-chip">Torsdag: Vandring på Nordre Kaupang</span>
+      <span class="event-chip">Arkeologisk utgraving</span>
+      <span class="event-chip">Vikingsuppe over bål</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── GALLERY ── -->
+<section id="galleri">
+  <div class="container">
+    <div class="gallery-header">
+      <span class="section-label" data-reveal>Bildegalleri</span>
+      <h2 class="section-title" data-reveal data-reveal-delay="1">Livet i Kaupang</h2>
+    </div>
+
+    <div class="gallery-grid" role="list" aria-label="Bildegalleri fra Kaupang Vikingby">
+      <div class="gallery-item gi-1" role="listitem">
+        <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=700&q=80&fit=crop" alt="Vikinglandskap i kveldslys" loading="lazy" />
+      </div>
+      <div class="gallery-item gi-2" role="listitem">
+        <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=400&q=80&fit=crop" alt="Tradisjonelt håndverk" loading="lazy" />
+      </div>
+      <div class="gallery-item gi-3" role="listitem">
+        <img src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&q=80&fit=crop" alt="Historiske artefakter" loading="lazy" />
+      </div>
+      <div class="gallery-item gi-4" role="listitem">
+        <img src="https://images.unsplash.com/photo-1564834744159-ff0ea41ba4b9?w=400&q=80&fit=crop" alt="Smie i aksjon" loading="lazy" />
+      </div>
+      <div class="gallery-item gi-5" role="listitem">
+        <img src="https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=700&q=80&fit=crop&crop=entropy" alt="Langhus og vikingmiljø" loading="lazy" />
+      </div>
+      <div class="gallery-item gi-6" role="listitem">
+        <img src="https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=400&q=80&fit=crop" alt="Natur og historisk landskap" loading="lazy" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PRACTICAL ── -->
+<section id="praktisk">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 4rem;">
+      <span class="section-label" data-reveal>Besøksinformasjon</span>
+      <h2 class="section-title" data-reveal data-reveal-delay="1">Planlegg ditt besøk</h2>
+      <div class="divider divider-center" data-reveal data-reveal-delay="2"></div>
+    </div>
+
+    <div class="practical-grid">
+      <div>
+        <!-- Åpningstider -->
+        <div class="info-block" data-reveal>
+          <h3>
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 6v4l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            Åpningstider
+          </h3>
+          <table class="info-table">
+            <tr><td>Sesong</td><td>24. juni – 30. august 2025</td></tr>
+            <tr><td>Tirsdag–søndag</td><td>kl. 10:00 – 17:00</td></tr>
+            <tr><td>Mandag</td><td>Stengt</td></tr>
+            <tr><td>Omvisninger</td><td>Daglig i åpningstiden</td></tr>
+            <tr><td>Torsdag</td><td>Vandring kl. 13:00 (~1 time)</td></tr>
+          </table>
+        </div>
+
+        <!-- Beliggenhet -->
+        <div class="info-block" data-reveal data-reveal-delay="1">
+          <h3>
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M10 2C7.24 2 5 4.24 5 7c0 4.5 5 11 5 11s5-6.5 5-11c0-2.76-2.24-5-5-5z" stroke="currentColor" stroke-width="1.5"/>
+              <circle cx="10" cy="7" r="2" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            Beliggenhet
+          </h3>
+          <table class="info-table">
+            <tr><td>Adresse</td><td>Kaupangveien 276, 3261 Larvik</td></tr>
+            <tr><td>Fra Larvik</td><td>Ca. 15 min med bil</td></tr>
+            <tr><td>Parkering</td><td>Gratis ved inngangen</td></tr>
+          </table>
+          <iframe
+            class="map-embed"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2022!2d10.1834!3d59.0714!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zKaupangveien 276 Larvik!5e0!3m2!1sno!2sno!4v1234567890"
+            title="Kart til Kaupang Vikingby"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+
+      <div>
+        <!-- Billetter -->
+        <div data-reveal data-reveal-delay="2">
+          <h3 style="font-family:'Cinzel',serif; font-size:1rem; font-weight:600; color:var(--ore); margin-bottom:1rem; display:flex; align-items:center; gap:0.75rem;">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="color:var(--ember);">
+              <path d="M2 8h16v8H2zM2 8l2-4h12l2 4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+              <circle cx="10" cy="12" r="2" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            Billettpriser
+          </h3>
+
+          <div class="ticket-card">
+            <span class="ticket-type">Voksen</span>
+            <span class="ticket-price">110 kr</span>
+            <p class="ticket-desc">Inkluderer guidet omvisning og alle aktiviteter</p>
+          </div>
+          <div class="ticket-card">
+            <span class="ticket-type">Barn under 16 år</span>
+            <span class="ticket-price">Gratis</span>
+            <p class="ticket-desc">Alle barn er velkomne uten billettpris</p>
+          </div>
+          <div class="ticket-card">
+            <span class="ticket-type">Grupper</span>
+            <span class="ticket-price">Avtal pris</span>
+            <p class="ticket-desc">Tilrettelagte opplegg for grupper opptil 100 personer</p>
+          </div>
+
+          <div style="margin-top: 2rem; padding: 1.5rem; border: 1px solid rgba(92,58,30,0.2); background: var(--parchment-deep);">
+            <p style="font-size: 0.95rem; color: var(--smoke); line-height: 1.7; margin-bottom: 1rem;">
+              <strong style="color: var(--ore);">Vikingsuppe (onsdager):</strong> Nylaget suppe til 50 kr. Inkluderer brødbaking over bål.
+            </p>
+            <a href="mailto:post@kaupangprosjektet.no" class="btn-primary" style="font-size: 0.75rem; display: inline-block;">
+              Book gruppe eller kurs
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section id="kontakt">
+  <div class="container">
+    <span class="section-label" data-reveal>Finn oss</span>
+    <h2 class="section-title" data-reveal data-reveal-delay="1">Kom og besøk oss</h2>
+    <div class="divider divider-center" data-reveal data-reveal-delay="2"></div>
+
+    <div class="contact-grid" data-reveal data-reveal-delay="2">
+      <div class="contact-item">
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M4 6h20v16H4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M4 6l10 10L24 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <h4>E-post</h4>
+        <a href="mailto:post@kaupangprosjektet.no">post@kaupangprosjektet.no</a>
+      </div>
+      <div class="contact-item">
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M6 4h5l2 5-2.5 2.5C11.5 14 14 16.5 17 18l2.5-2.5L24 18v5c0 1-1 2-2 2C8 24 4 10 4 6c0-1 1-2 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        <h4>Telefon</h4>
+        <a href="tel:+4790622744">+47 906 22 744</a>
+      </div>
+      <div class="contact-item">
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M14 3C8.477 3 4 7.477 4 13c0 8 10 14 10 14s10-6 10-14c0-5.523-4.477-10-10-10z" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="14" cy="13" r="3" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <h4>Adresse</h4>
+        <p>Kaupangveien 276<br>3261 Larvik</p>
+      </div>
+      <div class="contact-item">
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="14" cy="14" r="10" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M14 6v8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <h4>Sesong</h4>
+        <p>24. juni – 30. august<br>Tirsd.–sønd. 10–17</p>
+      </div>
+    </div>
+
+    <div class="social-row" data-reveal data-reveal-delay="3">
+      <a href="https://www.facebook.com/profile.php?id=6156069640471810" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Besøk oss på Facebook">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Følg oss på Facebook
+      </a>
+      <a href="mailto:post@kaupangprosjektet.no" class="social-btn" aria-label="Send oss en e-post">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Send oss en melding
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <p>
+    © 2025 Kaupang Vikingby · Kaupangveien 276, 3261 Larvik ·
+    <a href="mailto:post@kaupangprosjektet.no">post@kaupangprosjektet.no</a> ·
+    <a href="tel:+4790622744">+47 906 22 744</a>
+  </p>
+  <p style="margin-top: 0.5rem; font-size: 0.75rem; opacity: 0.5;">
+    Drevet av Kaupangprosjektet · Historisk formidling siden Norges første by ble grunnlagt år 800
+  </p>
+</footer>
+
+<script>
+  // Hamburger menu
+  const hamburger = document.getElementById('hamburger');
+  const navLinks = document.getElementById('navLinks');
+  hamburger.addEventListener('click', () => {
+    const open = navLinks.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', open);
+  });
+
+  // Close menu on link click
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      navLinks.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', false);
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('[data-reveal]');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  reveals.forEach(el => observer.observe(el));
+
+  // Nav shrink on scroll
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.style.height = window.scrollY > 60 ? '60px' : '72px';
+  }, { passive: true });
+</script>
+</body>
+</html>

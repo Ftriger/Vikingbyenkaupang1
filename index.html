@@ -2504,10 +2504,17 @@
     members.push({
       id: Date.now(),
       navn: data.navn,
+      fornavn: data.fornavn || '',
+      etternavn: data.etternavn || '',
+      adresse: data.adresse || '',
+      postnr: data.postnr || '',
+      poststed: data.poststed || '',
       epost: data.epost,
       telefon: data.telefon || '',
+      melding: data.melding || '',
+      type: data.type || 'enkelt',
       meldt: new Date().toISOString().split('T')[0],
-      status: 'vanlig',   // 'vanlig' | 'betalt'
+      status: 'vanlig',
       notat: ''
     });
     saveMembers(members);
@@ -2518,31 +2525,39 @@
     const panel = document.getElementById('dashMedlemmer');
     if (!panel) return;
     const members = getMembers();
+    const betalt = members.filter(m=>m.status==='betalt').length;
     const statusBadge = s => s === 'betalt'
       ? '<span style="background:#2a7a2a;color:#fff;padding:2px 9px;font-family:\'Cinzel\',serif;font-size:0.65rem;letter-spacing:.08em;border-radius:2px;">✓ Betalt</span>'
       : '<span style="background:var(--ash);color:#fff;padding:2px 9px;font-family:\'Cinzel\',serif;font-size:0.65rem;letter-spacing:.08em;border-radius:2px;">Vanlig</span>';
+    const typeBadge = t => t === 'familie'
+      ? '<span style="background:var(--forge);color:var(--parchment);padding:2px 8px;font-family:\'Cinzel\',serif;font-size:0.62rem;letter-spacing:.06em;border-radius:2px;">👨‍👩‍👧 Familie<br/>200 kr</span>'
+      : '<span style="background:var(--ore);color:var(--parchment);padding:2px 8px;font-family:\'Cinzel\',serif;font-size:0.62rem;letter-spacing:.06em;border-radius:2px;">👤 Enkelt<br/>150 kr</span>';
 
     panel.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
-        <h3 style="font-family:'Cinzel',serif;color:var(--ore);font-size:1.05rem;">Registrerte medlemmer (${members.length})</h3>
+        <div>
+          <h3 style="font-family:'Cinzel',serif;color:var(--ore);font-size:1.05rem;">Registrerte medlemmer</h3>
+          <p style="color:var(--smoke);font-size:0.85rem;margin-top:3px;">${members.length} totalt · ${betalt} betalte · ${members.filter(m=>m.type==='familie').length} familie · ${members.filter(m=>m.type==='enkelt').length} enkelt</p>
+        </div>
         <button class="add-btn" onclick="exportMembers()">⬇ Eksporter CSV</button>
       </div>
       ${members.length === 0
         ? '<p style="color:var(--smoke);font-style:italic;">Ingen registrerte medlemmer ennå.</p>'
         : `<div class="tw"><table class="dash-table">
-          <thead><tr><th>Navn</th><th>E-post</th><th>Telefon</th><th>Meldt inn</th><th>Status</th><th>Notat</th><th>Handlinger</th></tr></thead>
+          <thead><tr><th>Navn</th><th>Kontakt</th><th>Adresse</th><th>Type</th><th>Meldt inn</th><th>Status</th><th>Notat</th><th>Handlinger</th></tr></thead>
           <tbody>
             ${members.map(m => `<tr>
               <td><strong>${m.navn}</strong></td>
-              <td><a href="mailto:${m.epost}" style="color:var(--ember)">${m.epost}</a></td>
-              <td>${m.telefon || '–'}</td>
+              <td><a href="mailto:${m.epost}" style="color:var(--ember)">${m.epost}</a><br/><span style="color:var(--ash);font-size:0.82rem">${m.telefon||'–'}</span></td>
+              <td style="font-size:0.82rem;color:var(--smoke)">${m.adresse ? m.adresse + '<br/>' + m.postnr + ' ' + m.poststed : '–'}</td>
+              <td>${typeBadge(m.type)}</td>
               <td style="font-size:0.82rem;color:var(--ash)">${m.meldt}</td>
               <td>${statusBadge(m.status)}</td>
-              <td><input value="${m.notat||''}" placeholder="Notat…" onchange="updateMemberNotat(${m.id},this.value)" style="border:1px solid var(--parchment-deep);padding:3px 7px;font-family:'Crimson Pro',serif;font-size:0.88rem;width:120px;" /></td>
+              <td><input value="${m.notat||''}" placeholder="Notat…" onchange="updateMemberNotat(${m.id},this.value)" style="border:1px solid var(--parchment-deep);padding:3px 7px;font-family:'Crimson Pro',serif;font-size:0.88rem;width:110px;" /></td>
               <td>
                 ${m.status === 'betalt'
-                  ? `<button class="tbl-btn edit" onclick="setMemberStatus(${m.id},'vanlig')">Sett vanlig</button>`
-                  : `<button class="tbl-btn edit" onclick="setMemberStatus(${m.id},'betalt')">Merk betalt</button>`}
+                  ? `<button class="tbl-btn edit" onclick="setMemberStatus(${m.id},'vanlig')">Vanlig</button>`
+                  : `<button class="tbl-btn edit" onclick="setMemberStatus(${m.id},'betalt')">✓ Betalt</button>`}
                 <button class="tbl-btn del" onclick="deleteMember(${m.id})">Slett</button>
               </td>
             </tr>`).join('')}
@@ -2572,8 +2587,8 @@
 
   function exportMembers() {
     const members = getMembers();
-    const csv = ['Navn,E-post,Telefon,Meldt inn,Status,Notat']
-      .concat(members.map(m => `"${m.navn}","${m.epost}","${m.telefon}","${m.meldt}","${m.status}","${m.notat||''}"`))
+    const csv = ['Navn,E-post,Telefon,Adresse,Postnr,Poststed,Type,Pris,Meldt inn,Status,Notat']
+      .concat(members.map(m => `"${m.navn}","${m.epost}","${m.telefon||''}","${m.adresse||''}","${m.postnr||''}","${m.poststed||''}","${m.type==='familie'?'Familie':'Enkelt'}","${m.type==='familie'?200:150}","${m.meldt}","${m.status}","${m.notat||''}"`))
       .join('\n');
     const a = document.createElement('a');
     a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
@@ -2918,22 +2933,71 @@
     document.getElementById('memberTitle').textContent = 'Hei, ' + currentUser.name + ' 👋';
     document.getElementById('memberContent').innerHTML =
       (!alreadyReg ? `
-      <div class="member-card" style="border-top-color:var(--ember);">
-        <h3>📋 Registrer deg som medlem</h3>
-        <p style="color:var(--smoke);margin-bottom:16px;font-size:0.95rem;">Registrer kontaktinformasjonen din så vi kan holde deg oppdatert og bekrefte medlemskapet ditt.</p>
-        <div class="form-field"><label>Fullt navn *</label><input id="regNavn" placeholder="Ola Nordmann" /></div>
-        <div class="form-field"><label>E-post *</label><input id="regEpost" type="email" placeholder="ola@eksempel.no" /></div>
-        <div class="form-field"><label>Telefon</label><input id="regTelefon" type="tel" placeholder="+47 000 00 000" /></div>
-        <div id="regErr" class="form-err" style="display:none;"></div>
-        <div id="regOk" style="display:none;background:rgba(42,122,42,0.1);border:1px solid #2a7a2a;color:#2a7a2a;padding:10px 14px;font-style:italic;margin-bottom:8px;">✓ Registrering mottatt! Leder vil bekrefte medlemskapet.</div>
-        <button class="modal-submit" onclick="submitRegistration()">Send registrering</button>
+      <div style="background:var(--parchment-deep);border-radius:4px;overflow:hidden;margin-bottom:20px;">
+        <!-- Header banner -->
+        <div style="background:linear-gradient(135deg,var(--ore) 0%,var(--forge) 100%);padding:32px 32px 24px;position:relative;overflow:hidden;">
+          <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(255,255,255,.03) 40px,rgba(255,255,255,.03) 41px);"></div>
+          <div style="position:relative;">
+            <p style="font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.28em;color:rgba(245,237,216,.6);text-transform:uppercase;margin-bottom:8px;">Kaupangprosjektet</p>
+            <h2 style="font-family:'Cinzel',serif;font-size:clamp(1.4rem,3vw,2rem);color:var(--parchment);font-weight:900;line-height:1.15;margin-bottom:12px;">Bli medlem i<br/>Kaupangprosjektet!</h2>
+            <p style="color:rgba(245,237,216,.75);font-style:italic;font-size:1rem;line-height:1.55;">Støtt bevaring og formidling av Norges første by. Som medlem får du nyhetsbrev, invitasjoner og er med på å gjøre historien levende.</p>
+          </div>
+        </div>
+
+        <!-- Membership type cards -->
+        <div style="padding:24px 28px 0;">
+          <p style="font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke);margin-bottom:12px;">Velg type medlemskap *</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
+            <label id="card-enkelt" onclick="selectMembership('enkelt')" style="cursor:pointer;border:2px solid var(--ember);background:var(--ember);border-radius:3px;padding:16px;text-align:center;transition:all .2s;">
+              <input type="radio" name="regType" value="enkelt" id="typeEnkelt" style="display:none;" checked />
+              <div style="font-size:1.5rem;margin-bottom:6px;">👤</div>
+              <div style="font-family:'Cinzel',serif;color:var(--parchment);font-size:.85rem;font-weight:600;">Enkeltperson</div>
+              <div style="font-family:'Cinzel',serif;color:rgba(245,237,216,.8);font-size:1.3rem;font-weight:900;margin-top:4px;">150 kr</div>
+              <div style="color:rgba(245,237,216,.6);font-size:.75rem;margin-top:2px;">per år</div>
+            </label>
+            <label id="card-familie" onclick="selectMembership('familie')" style="cursor:pointer;border:2px solid var(--parchment-deep);background:var(--parchment);border-radius:3px;padding:16px;text-align:center;transition:all .2s;">
+              <input type="radio" name="regType" value="familie" id="typeFamilie" style="display:none;" />
+              <div style="font-size:1.5rem;margin-bottom:6px;">👨‍👩‍👧</div>
+              <div style="font-family:'Cinzel',serif;color:var(--ore);font-size:.85rem;font-weight:600;">Familie</div>
+              <div style="font-family:'Cinzel',serif;color:var(--ember);font-size:1.3rem;font-weight:900;margin-top:4px;">200 kr</div>
+              <div style="color:var(--ash);font-size:.75rem;margin-top:2px;">per år</div>
+            </label>
+          </div>
+
+          <!-- Form fields -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div class="form-field" style="margin-bottom:0;"><label>Fornavn *</label><input id="regFornavn" placeholder="Ola" /></div>
+            <div class="form-field" style="margin-bottom:0;"><label>Etternavn *</label><input id="regEtternavn" placeholder="Nordmann" /></div>
+          </div>
+          <div class="form-field" style="margin-top:12px;"><label>Postadresse *</label><input id="regAdresse" placeholder="Gateveien 1" /></div>
+          <div style="display:grid;grid-template-columns:100px 1fr;gap:12px;">
+            <div class="form-field" style="margin-bottom:0;"><label>Postnr. *</label><input id="regPostnr" placeholder="0000" /></div>
+            <div class="form-field" style="margin-bottom:0;"><label>Poststed *</label><input id="regPoststed" placeholder="Oslo" /></div>
+          </div>
+          <div class="form-field" style="margin-top:12px;"><label>E-postadresse *</label><input id="regEpost" type="email" placeholder="ola@eksempel.no" /></div>
+          <div class="form-field"><label>Mobiltelefon *</label><input id="regTelefon" type="tel" placeholder="+47 000 00 000" /></div>
+          <div class="form-field"><label>Beskjed til Kaupangprosjektet</label><textarea id="regMelding" rows="2" placeholder="Valgfritt…"></textarea></div>
+
+          <div id="regErr" class="form-err" style="display:none;margin-bottom:10px;"></div>
+          <div id="regOk" style="display:none;background:rgba(42,122,42,.1);border:1px solid #2a7a2a;color:#2a7a2a;padding:12px 16px;font-style:italic;margin-bottom:12px;border-radius:2px;">✓ Registrering mottatt! Du vil få faktura tilsendt på e-post.</div>
+        </div>
+
+        <!-- Submit -->
+        <div style="padding:0 28px 28px;">
+          <button class="modal-submit" style="margin-top:12px;border-radius:3px;font-size:.85rem;padding:13px;" onclick="submitRegistration()">Meld meg inn</button>
+          <p style="color:var(--ash);font-size:.75rem;text-align:center;margin-top:10px;font-style:italic;">Du vil motta faktura på e-post. Vedtektene finner du <a href="https://kaupangprosjektet.no/omkp/vedtekter2012.php" target="_blank" style="color:var(--ember);">her</a>.</p>
+        </div>
       </div>` : `
-      <div class="member-card" style="border-top-color:#2a7a2a;">
-        <h3>✓ Registrert medlem</h3>
-        <p style="color:var(--smoke);">Du er registrert som <strong>${alreadyReg.status === 'betalt' ? '✓ Betalende' : 'Vanlig'}</strong> medlem siden ${alreadyReg.meldt}.</p>
-        ${alreadyReg.status === 'betalt'
-          ? '<p style="color:#2a7a2a;margin-top:8px;font-style:italic;">✓ Medlemsavgift bekreftet betalt</p>'
-          : '<p style="color:var(--ash);margin-top:8px;font-size:0.88rem;font-style:italic;">Kontakt leder@vikingbyen.org for å bekrefte betaling.</p>'}
+      <div style="background:linear-gradient(135deg,#1a3a1a 0%,#2a5a2a 100%);border-radius:4px;padding:28px;margin-bottom:20px;position:relative;overflow:hidden;">
+        <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(255,255,255,.02) 40px,rgba(255,255,255,.02) 41px);"></div>
+        <div style="position:relative;">
+          <p style="font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.28em;color:rgba(200,240,200,.5);text-transform:uppercase;margin-bottom:8px;">Status</p>
+          <h3 style="font-family:'Cinzel',serif;color:#c8f0c8;font-size:1.3rem;margin-bottom:10px;">✓ Registrert medlem</h3>
+          <p style="color:rgba(200,240,200,.8);">Du er registrert som <strong>${alreadyReg.type === 'familie' ? 'Familiemedlem' : 'Enkeltmedlem'}</strong> siden ${alreadyReg.meldt}.</p>
+          ${alreadyReg.status === 'betalt'
+            ? '<div style="margin-top:12px;background:rgba(255,255,255,.1);border:1px solid rgba(200,240,200,.3);padding:10px 14px;border-radius:2px;color:#c8f0c8;font-style:italic;">✓ Medlemsavgift bekreftet betalt</div>'
+            : '<div style="margin-top:12px;background:rgba(255,255,255,.08);border:1px solid rgba(200,240,200,.2);padding:10px 14px;border-radius:2px;color:rgba(200,240,200,.7);font-size:.88rem;font-style:italic;">Faktura sendes på e-post. Ta kontakt med leder@vikingbyen.org ved spørsmål.</div>'}
+        </div>
       </div>`) +
       `<div class="member-card">
         <h3>🏹 Ukentlig aktivitetsprogram (30. juni – 16. august)</h3>
@@ -2953,26 +3017,65 @@
     document.getElementById('member-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  function selectMembership(type) {
+    const isEnkelt = type === 'enkelt';
+    const cEnkelt = document.getElementById('card-enkelt');
+    const cFamilie = document.getElementById('card-familie');
+    if (!cEnkelt || !cFamilie) return;
+    cEnkelt.style.border = isEnkelt ? '2px solid var(--ember)' : '2px solid var(--parchment-deep)';
+    cEnkelt.style.background = isEnkelt ? 'var(--ember)' : 'var(--parchment)';
+    cEnkelt.querySelector('div:nth-child(2)').style.color = isEnkelt ? 'var(--parchment)' : 'var(--ore)';
+    cFamilie.style.border = !isEnkelt ? '2px solid var(--ember)' : '2px solid var(--parchment-deep)';
+    cFamilie.style.background = !isEnkelt ? 'var(--ember)' : 'var(--parchment)';
+    cFamilie.querySelector('div:nth-child(2)').style.color = !isEnkelt ? 'var(--parchment)' : 'var(--ore)';
+    document.getElementById('type' + (isEnkelt ? 'Enkelt' : 'Familie')).checked = true;
+  }
+
   function submitRegistration() {
-    const navn    = document.getElementById('regNavn').value.trim();
-    const epost   = document.getElementById('regEpost').value.trim();
-    const telefon = document.getElementById('regTelefon').value.trim();
-    const err     = document.getElementById('regErr');
-    const ok      = document.getElementById('regOk');
+    const fornavn  = (document.getElementById('regFornavn')?.value || '').trim();
+    const etternavn= (document.getElementById('regEtternavn')?.value || '').trim();
+    const adresse  = (document.getElementById('regAdresse')?.value || '').trim();
+    const postnr   = (document.getElementById('regPostnr')?.value || '').trim();
+    const poststed = (document.getElementById('regPoststed')?.value || '').trim();
+    const epost    = (document.getElementById('regEpost')?.value || '').trim();
+    const telefon  = (document.getElementById('regTelefon')?.value || '').trim();
+    const melding  = (document.getElementById('regMelding')?.value || '').trim();
+    const typeEl   = document.querySelector('input[name="regType"]:checked');
+    const type     = typeEl ? typeEl.value : 'enkelt';
+    const navn     = (fornavn + ' ' + etternavn).trim();
+
+    const err = document.getElementById('regErr');
+    const ok  = document.getElementById('regOk');
     err.style.display = 'none';
-    if (!navn || !epost) { err.textContent = 'Navn og e-post er påkrevd'; err.style.display = 'block'; return; }
-    if (!/^[^@]+@[^@]+\.[^@]+$/.test(epost)) { err.textContent = 'Ugyldig e-postadresse'; err.style.display = 'block'; return; }
-    const result = registerMember({ navn, epost, telefon });
+
+    if (!fornavn || !etternavn) { err.textContent = 'Fornavn og etternavn er påkrevd'; err.style.display = 'block'; return; }
+    if (!adresse || !postnr || !poststed) { err.textContent = 'Postadresse er påkrevd'; err.style.display = 'block'; return; }
+    if (!epost || !/^[^@]+@[^@]+\.[^@]+$/.test(epost)) { err.textContent = 'Gyldig e-postadresse er påkrevd'; err.style.display = 'block'; return; }
+    if (!telefon) { err.textContent = 'Mobiltelefon er påkrevd'; err.style.display = 'block'; return; }
+
+    const result = registerMember({ navn, fornavn, etternavn, adresse, postnr, poststed, epost, telefon, melding, type });
     if (!result.ok) { err.textContent = result.msg; err.style.display = 'block'; return; }
+
     currentUser.epost = epost;
     ok.style.display = 'block';
-    const subject = encodeURIComponent('Nytt medlemskap – ' + navn);
-    const body = encodeURIComponent('Nytt medlem har registrert seg:\n\nNavn: ' + navn + '\nE-post: ' + epost + '\nTelefon: ' + (telefon||'–') + '\n\nLogg inn på siden for å bekrefte og sette status.');
+
+    const pris = type === 'familie' ? '200' : '150';
+    const subject = encodeURIComponent('Nytt ' + (type === 'familie' ? 'familiemedlemskap' : 'enkeltmedlemskap') + ' – ' + navn);
+    const body = encodeURIComponent(
+      'Nytt medlem har registrert seg:\n\n' +
+      'Navn: ' + navn + '\n' +
+      'Adresse: ' + adresse + ', ' + postnr + ' ' + poststed + '\n' +
+      'E-post: ' + epost + '\n' +
+      'Telefon: ' + telefon + '\n' +
+      'Type: ' + (type === 'familie' ? 'Familiemedlemskap (200 kr)' : 'Enkeltmedlemskap (150 kr)') + '\n' +
+      (melding ? 'Beskjed: ' + melding + '\n' : '') +
+      '\nSend faktura på ' + pris + ' kr til ovennevnte e-postadresse.\nLogg inn på siden for å bekrefte og sette betalingsstatus.'
+    );
     setTimeout(() => {
       window.open('mailto:leder@vikingbyen.org?subject=' + subject + '&body=' + body, '_blank');
       showMember();
     }, 900);
-    toast('Registrering sendt!');
+    toast('Registrering sendt! Faktura kommer på e-post.');
   }
 
   // ── GALLERY LIGHTBOX ─────────────────────────────────────────

@@ -2469,10 +2469,116 @@
   }
 
   function checkout() {
+    if (cart.length === 0) return;
+    const lines = cart.map(i => `- ${i.name} (${i.qty}×) = ${i.price * i.qty} kr`).join('\n');
+    const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+    const subject = encodeURIComponent('Bestilling fra Vikingbutikken');
+    const body = encodeURIComponent(
+      'Hei!\n\nJeg ønsker å bestille følgende:\n\n' + lines +
+      '\n\nTotalt: ' + total + ' kr\n\n' +
+      'Navn:\nAdresse:\nTelefon:\n\nMvh'
+    );
+    window.open('mailto:leder@vikingbyen.org?subject=' + subject + '&body=' + body, '_blank');
     cart = [];
     renderCart();
     toggleCart();
-    toast('Bestilling mottatt! Vi tar kontakt på e-post.');
+    toast('Bestillingsepost åpnet – send den for å fullføre!');
+  }
+
+  // ── MEDLEMSREGISTER ───────────────────────────────────────────
+  function getMembers() {
+    try {
+      const s = localStorage.getItem('kv_members');
+      return s ? JSON.parse(s) : [];
+    } catch(e) { return []; }
+  }
+
+  function saveMembers(members) {
+    try { localStorage.setItem('kv_members', JSON.stringify(members)); } catch(e) {}
+  }
+
+  function registerMember(data) {
+    const members = getMembers();
+    const exists = members.find(m => m.epost.toLowerCase() === data.epost.toLowerCase());
+    if (exists) return { ok: false, msg: 'Denne e-postadressen er allerede registrert.' };
+    members.push({
+      id: Date.now(),
+      navn: data.navn,
+      epost: data.epost,
+      telefon: data.telefon || '',
+      meldt: new Date().toISOString().split('T')[0],
+      status: 'vanlig',   // 'vanlig' | 'betalt'
+      notat: ''
+    });
+    saveMembers(members);
+    return { ok: true };
+  }
+
+  function renderMemberTable() {
+    const panel = document.getElementById('dashMedlemmer');
+    if (!panel) return;
+    const members = getMembers();
+    const statusBadge = s => s === 'betalt'
+      ? '<span style="background:#2a7a2a;color:#fff;padding:2px 9px;font-family:\'Cinzel\',serif;font-size:0.65rem;letter-spacing:.08em;border-radius:2px;">✓ Betalt</span>'
+      : '<span style="background:var(--ash);color:#fff;padding:2px 9px;font-family:\'Cinzel\',serif;font-size:0.65rem;letter-spacing:.08em;border-radius:2px;">Vanlig</span>';
+
+    panel.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+        <h3 style="font-family:'Cinzel',serif;color:var(--ore);font-size:1.05rem;">Registrerte medlemmer (${members.length})</h3>
+        <button class="add-btn" onclick="exportMembers()">⬇ Eksporter CSV</button>
+      </div>
+      ${members.length === 0
+        ? '<p style="color:var(--smoke);font-style:italic;">Ingen registrerte medlemmer ennå.</p>'
+        : `<div class="tw"><table class="dash-table">
+          <thead><tr><th>Navn</th><th>E-post</th><th>Telefon</th><th>Meldt inn</th><th>Status</th><th>Notat</th><th>Handlinger</th></tr></thead>
+          <tbody>
+            ${members.map(m => `<tr>
+              <td><strong>${m.navn}</strong></td>
+              <td><a href="mailto:${m.epost}" style="color:var(--ember)">${m.epost}</a></td>
+              <td>${m.telefon || '–'}</td>
+              <td style="font-size:0.82rem;color:var(--ash)">${m.meldt}</td>
+              <td>${statusBadge(m.status)}</td>
+              <td><input value="${m.notat||''}" placeholder="Notat…" onchange="updateMemberNotat(${m.id},this.value)" style="border:1px solid var(--parchment-deep);padding:3px 7px;font-family:'Crimson Pro',serif;font-size:0.88rem;width:120px;" /></td>
+              <td>
+                ${m.status === 'betalt'
+                  ? `<button class="tbl-btn edit" onclick="setMemberStatus(${m.id},'vanlig')">Sett vanlig</button>`
+                  : `<button class="tbl-btn edit" onclick="setMemberStatus(${m.id},'betalt')">Merk betalt</button>`}
+                <button class="tbl-btn del" onclick="deleteMember(${m.id})">Slett</button>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table></div>`
+      }`;
+  }
+
+  function setMemberStatus(id, status) {
+    const members = getMembers();
+    const m = members.find(x => x.id === id);
+    if (m) { m.status = status; saveMembers(members); renderMemberTable(); toast('Status oppdatert'); }
+  }
+
+  function updateMemberNotat(id, notat) {
+    const members = getMembers();
+    const m = members.find(x => x.id === id);
+    if (m) { m.notat = notat; saveMembers(members); }
+  }
+
+  function deleteMember(id) {
+    if (!confirm('Slette dette medlemmet?')) return;
+    saveMembers(getMembers().filter(m => m.id !== id));
+    renderMemberTable();
+    toast('Medlem slettet');
+  }
+
+  function exportMembers() {
+    const members = getMembers();
+    const csv = ['Navn,E-post,Telefon,Meldt inn,Status,Notat']
+      .concat(members.map(m => `"${m.navn}","${m.epost}","${m.telefon}","${m.meldt}","${m.status}","${m.notat||''}"`))
+      .join('\n');
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = 'kaupang-medlemmer.csv';
+    a.click();
   }
 
   // ── ARTICLES ─────────────────────────────────────────────────
@@ -2639,9 +2745,13 @@
   function renderStats() {
     const cartCount = cart.reduce((s,i)=>s+i.qty,0);
     const cartTotal = cart.reduce((s,i)=>s+i.price*i.qty,0);
+    const members = getMembers();
+    const betalt = members.filter(m=>m.status==='betalt').length;
     document.getElementById('statGrid').innerHTML = [
       ['Artikler', articles.length, '📰'],
       ['Produkter', products.length, '🛒'],
+      ['Medlemmer', members.length, '👥'],
+      ['Betalende', betalt, '✓'],
       ['I handlekurv', cartCount, '🧺'],
       ['Butikktotal', cartTotal + ' kr', '💰']
     ].map(([l,v,i]) => `<div class="stat-card"><div style="font-size:1.8rem">${i}</div><div class="stat-val">${v}</div><div class="stat-lbl">${l}</div></div>`).join('');
@@ -2649,7 +2759,7 @@
 
   // ── DASH TABS ────────────────────────────────────────────────
   function switchDashTab(name, btn) {
-    ['dashArtikler','dashProdukter','dashOversikt','dashPassord','dashBrukere'].forEach(id => {
+    ['dashArtikler','dashProdukter','dashOversikt','dashPassord','dashMedlemmer','dashBrukere'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.style.display = 'none';
     });
@@ -2660,6 +2770,7 @@
     btn.classList.add('active');
     if (name === 'oversikt') renderStats();
     if (name === 'brukere') renderUserTable();
+    if (name === 'medlemmer') renderMemberTable();
   }
 
   // ── SHOW ADMIN / MEMBER ──────────────────────────────────────
@@ -2679,11 +2790,19 @@
       passTab.onclick = function() { switchDashTab('passord', this); };
       tabs.appendChild(passTab);
     }
+    if (!document.getElementById('tabMedlemmer')) {
+      const memTab = document.createElement('button');
+      memTab.className = 'dash-tab';
+      memTab.id = 'tabMedlemmer';
+      memTab.textContent = '👥 Medlemmer';
+      memTab.onclick = function() { switchDashTab('medlemmer', this); };
+      tabs.appendChild(memTab);
+    }
     if (isSuperAdmin && !document.getElementById('tabBrukere')) {
       const userTab = document.createElement('button');
       userTab.className = 'dash-tab';
       userTab.id = 'tabBrukere';
-      userTab.textContent = '👥 Brukere';
+      userTab.textContent = '🔐 Brukere';
       userTab.onclick = function() { switchDashTab('brukere', this); };
       tabs.appendChild(userTab);
     }
@@ -2703,6 +2822,14 @@
           <div id="cpSuccess" style="display:none;color:green;font-style:italic;margin-bottom:8px;">✓ Passord oppdatert!</div>
           <button class="modal-submit" onclick="doChangePasswordInline()">Oppdater passord</button>
         </div>`;
+      document.getElementById('admin-section').querySelector('.container').appendChild(panel);
+    }
+
+    // Add medlemmer panel if missing
+    if (!document.getElementById('dashMedlemmer')) {
+      const panel = document.createElement('div');
+      panel.id = 'dashMedlemmer';
+      panel.style.display = 'none';
       document.getElementById('admin-section').querySelector('.container').appendChild(panel);
     }
 
@@ -2786,9 +2913,29 @@
       { day: 'Fredager', activity: 'Arkeologisk graving', icon: '⛏️' },
       { day: 'Søndager', activity: 'Fortellinger', icon: '📜' },
     ];
+    const members = getMembers();
+    const alreadyReg = members.find(m => m.epost && currentUser.epost && m.epost.toLowerCase() === currentUser.epost.toLowerCase());
     document.getElementById('memberTitle').textContent = 'Hei, ' + currentUser.name + ' 👋';
-    document.getElementById('memberContent').innerHTML = `
-      <div class="member-card">
+    document.getElementById('memberContent').innerHTML =
+      (!alreadyReg ? `
+      <div class="member-card" style="border-top-color:var(--ember);">
+        <h3>📋 Registrer deg som medlem</h3>
+        <p style="color:var(--smoke);margin-bottom:16px;font-size:0.95rem;">Registrer kontaktinformasjonen din så vi kan holde deg oppdatert og bekrefte medlemskapet ditt.</p>
+        <div class="form-field"><label>Fullt navn *</label><input id="regNavn" placeholder="Ola Nordmann" /></div>
+        <div class="form-field"><label>E-post *</label><input id="regEpost" type="email" placeholder="ola@eksempel.no" /></div>
+        <div class="form-field"><label>Telefon</label><input id="regTelefon" type="tel" placeholder="+47 000 00 000" /></div>
+        <div id="regErr" class="form-err" style="display:none;"></div>
+        <div id="regOk" style="display:none;background:rgba(42,122,42,0.1);border:1px solid #2a7a2a;color:#2a7a2a;padding:10px 14px;font-style:italic;margin-bottom:8px;">✓ Registrering mottatt! Leder vil bekrefte medlemskapet.</div>
+        <button class="modal-submit" onclick="submitRegistration()">Send registrering</button>
+      </div>` : `
+      <div class="member-card" style="border-top-color:#2a7a2a;">
+        <h3>✓ Registrert medlem</h3>
+        <p style="color:var(--smoke);">Du er registrert som <strong>${alreadyReg.status === 'betalt' ? '✓ Betalende' : 'Vanlig'}</strong> medlem siden ${alreadyReg.meldt}.</p>
+        ${alreadyReg.status === 'betalt'
+          ? '<p style="color:#2a7a2a;margin-top:8px;font-style:italic;">✓ Medlemsavgift bekreftet betalt</p>'
+          : '<p style="color:var(--ash);margin-top:8px;font-size:0.88rem;font-style:italic;">Kontakt leder@vikingbyen.org for å bekrefte betaling.</p>'}
+      </div>`) +
+      `<div class="member-card">
         <h3>🏹 Ukentlig aktivitetsprogram (30. juni – 16. august)</h3>
         ${SCHEDULE.map(s => `<div style="display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--parchment-deep)"><span style="font-size:1.2rem">${s.icon}</span><div><strong style="font-family:'Cinzel',serif;font-size:0.87rem">${s.day}: </strong><span style="color:var(--smoke)">${s.activity}</span></div></div>`).join('')}
         <p style="color:var(--ash);font-size:0.8rem;margin-top:10px;font-style:italic">Kl. 11:00, 13:00 og 15:00 · 30–60 minutter</p>
@@ -2799,12 +2946,33 @@
       </div>
       <div class="member-card">
         <h3>📬 Kontakt</h3>
-        <p><a href="mailto:post@kaupangprosjektet.no" style="color:var(--ember)">post@kaupangprosjektet.no</a> · <a href="tel:+4790622744" style="color:var(--ember)">+47 906 22 744</a></p>
-      </div>
-    `;
+        <p><a href="mailto:leder@vikingbyen.org" style="color:var(--ember)">leder@vikingbyen.org</a> · <a href="tel:+4790622744" style="color:var(--ember)">+47 906 22 744</a></p>
+      </div>`;
     document.getElementById('member-section').classList.add('visible');
     document.getElementById('admin-section').classList.remove('visible');
     document.getElementById('member-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function submitRegistration() {
+    const navn    = document.getElementById('regNavn').value.trim();
+    const epost   = document.getElementById('regEpost').value.trim();
+    const telefon = document.getElementById('regTelefon').value.trim();
+    const err     = document.getElementById('regErr');
+    const ok      = document.getElementById('regOk');
+    err.style.display = 'none';
+    if (!navn || !epost) { err.textContent = 'Navn og e-post er påkrevd'; err.style.display = 'block'; return; }
+    if (!/^[^@]+@[^@]+\.[^@]+$/.test(epost)) { err.textContent = 'Ugyldig e-postadresse'; err.style.display = 'block'; return; }
+    const result = registerMember({ navn, epost, telefon });
+    if (!result.ok) { err.textContent = result.msg; err.style.display = 'block'; return; }
+    currentUser.epost = epost;
+    ok.style.display = 'block';
+    const subject = encodeURIComponent('Nytt medlemskap – ' + navn);
+    const body = encodeURIComponent('Nytt medlem har registrert seg:\n\nNavn: ' + navn + '\nE-post: ' + epost + '\nTelefon: ' + (telefon||'–') + '\n\nLogg inn på siden for å bekrefte og sette status.');
+    setTimeout(() => {
+      window.open('mailto:leder@vikingbyen.org?subject=' + subject + '&body=' + body, '_blank');
+      showMember();
+    }, 900);
+    toast('Registrering sendt!');
   }
 
   // ── GALLERY LIGHTBOX ─────────────────────────────────────────

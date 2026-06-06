@@ -6,7 +6,7 @@
   <title>Kaupang Vikingby – Trå inn i historien | Larvik, Vestfold</title>
 
   <!-- SEO Meta -->
-  <meta name="description" content="Kaupang Vikingby i Larvik inviterer deg til å oppleve ekte vikingtid. Besøk Norges første by med guidede omvisninger, smiing, bueskyting, markeder og levende historie. Åpent sommer 2025." />
+  <meta name="description" content="Kaupang Vikingby i Larvik inviterer deg til å oppleve ekte vikingtid. Besøk Norges første by med guidede omvisninger, smiing, bueskyting, markeder og levende historie. Åpent sommer 2026." />
   <meta name="keywords" content="Kaupang vikingby, vikingmuseum Larvik, vikingtid Norge, vikingopplevelse, smiing kurs, bueskyting viking, Vestfold museum, historisk formidling, Kaupangveien Larvik" />
   <meta name="robots" content="index, follow" />
   <meta name="author" content="Kaupangprosjektet" />
@@ -46,8 +46,8 @@
       "dayOfWeek": ["Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
       "opens": "10:00",
       "closes": "17:00",
-      "validFrom": "2025-06-24",
-      "validThrough": "2025-08-30"
+      "validFrom": "2026-06-24",
+      "validThrough": "2026-08-30"
     },
     "geo": {
       "@type": "GeoCoordinates",
@@ -574,42 +574,619 @@
 
     .gallery-header .section-title { color: var(--parchment); }
 
+    /* Masonry grid */
     .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      grid-template-rows: auto;
-      gap: 4px;
+      columns: 4 180px;
+      gap: 8px;
     }
 
     .gallery-item {
-      overflow: hidden;
+      break-inside: avoid;
+      margin-bottom: 8px;
       position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      border-radius: 3px;
+      background: var(--ore-mid);
     }
 
     .gallery-item img {
       width: 100%;
-      height: 100%;
-      object-fit: cover;
       display: block;
       filter: sepia(15%) contrast(1.05) brightness(0.95);
-      transition: transform 0.6s, filter 0.4s;
+      transition: transform 0.45s ease, filter 0.3s ease;
+      object-fit: cover;
     }
 
     .gallery-item:hover img {
-      transform: scale(1.04);
-      filter: sepia(5%) contrast(1.08) brightness(1.02);
+      transform: scale(1.05);
+      filter: sepia(5%) contrast(1.08) brightness(1.05);
     }
 
-    .gi-1 { grid-column: 1 / 6; grid-row: 1; aspect-ratio: 4/3; }
-    .gi-2 { grid-column: 6 / 9; grid-row: 1; aspect-ratio: 3/4; }
-    .gi-3 { grid-column: 9 / 13; grid-row: 1; aspect-ratio: 4/3; }
-    .gi-4 { grid-column: 1 / 4; grid-row: 2; aspect-ratio: 4/3; }
-    .gi-5 { grid-column: 4 / 9; grid-row: 2; aspect-ratio: 16/9; }
-    .gi-6 { grid-column: 9 / 13; grid-row: 2; aspect-ratio: 4/3; }
-    .gi-7 { grid-column: 1 / 4; grid-row: 3; aspect-ratio: 4/3; }
-    .gi-8 { grid-column: 4 / 7; grid-row: 3; aspect-ratio: 4/3; }
-    .gi-9 { grid-column: 7 / 10; grid-row: 3; aspect-ratio: 4/3; }
-    .gi-10 { grid-column: 10 / 13; grid-row: 3; aspect-ratio: 4/3; }
+    .gallery-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(26,16,8,0);
+      transition: background 0.3s;
+      display: flex;
+      align-items: flex-end;
+      padding: 14px;
+    }
+
+    .gallery-item:hover .gallery-overlay {
+      background: rgba(26,16,8,0.55);
+    }
+
+    .gallery-caption {
+      color: #fff;
+      font-size: 0.82rem;
+      font-style: italic;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: all 0.28s ease;
+      line-height: 1.4;
+    }
+
+    .gallery-item:hover .gallery-caption {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .gallery-zoom-icon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(212,168,83,0.9);
+      color: var(--ore);
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+    }
+
+    .gallery-item:hover .gallery-zoom-icon {
+      opacity: 1;
+    }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(10,6,2,0.96);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      animation: lbFadeIn 0.22s ease;
+    }
+
+    @keyframes lbFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .lightbox-inner {
+      position: relative;
+      max-width: 920px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .lightbox-img {
+      max-width: 100%;
+      max-height: 76vh;
+      object-fit: contain;
+      border-radius: 3px;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.7);
+      border: 1px solid rgba(212,168,83,0.2);
+      display: block;
+    }
+
+    .lightbox-caption {
+      color: #c0b09a;
+      font-style: italic;
+      margin-top: 14px;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .lightbox-counter {
+      color: var(--gold);
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      margin-top: 5px;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: -48px;
+      right: 0;
+      background: none;
+      border: 1px solid rgba(212,168,83,0.4);
+      color: var(--gold);
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.18s;
+    }
+
+    .lightbox-close:hover {
+      background: var(--gold);
+      color: var(--ore);
+    }
+
+    .lightbox-prev,
+    .lightbox-next {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(212,168,83,0.15);
+      border: 1px solid rgba(212,168,83,0.35);
+      color: var(--gold);
+      width: 46px;
+      height: 70px;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.18s;
+      z-index: 1001;
+    }
+
+    .lightbox-prev { left: 8px; border-radius: 0 4px 4px 0; }
+    .lightbox-next { right: 8px; border-radius: 4px 0 0 4px; }
+    .lightbox-prev:hover,
+    .lightbox-next:hover { background: var(--gold); color: var(--ore); }
+
+    .lightbox-thumbs {
+      display: flex;
+      gap: 6px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 620px;
+    }
+
+    .lb-thumb {
+      width: 54px;
+      height: 42px;
+      object-fit: cover;
+      cursor: pointer;
+      border-radius: 2px;
+      opacity: 0.45;
+      border: 2px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .lb-thumb.active,
+    .lb-thumb:hover {
+      opacity: 1;
+      border-color: var(--gold);
+    }
+
+    /* ── LOGIN / MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(26,16,8,0.88);
+      z-index: 500;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+      background: var(--parchment);
+      width: 100%;
+      max-width: 420px;
+      border: 2px solid var(--gold);
+      padding: 32px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-box h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      color: var(--ore);
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .modal-box .modal-sub {
+      font-size: 0.75rem;
+      letter-spacing: 0.22em;
+      color: var(--smoke);
+      text-align: center;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      display: block;
+    }
+
+    .modal-box.wide { max-width: 560px; }
+
+    .form-field { margin-bottom: 14px; }
+    .form-field label {
+      display: block;
+      font-family: 'Cinzel', serif;
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      color: var(--smoke);
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .form-field input,
+    .form-field textarea,
+    .form-field select {
+      width: 100%;
+      border: 1px solid var(--parchment-deep);
+      background: #fff;
+      padding: 9px 11px;
+      font-family: 'Crimson Pro', serif;
+      font-size: 1rem;
+      color: var(--ore);
+      outline: none;
+      transition: border 0.18s;
+    }
+
+    .form-field input:focus,
+    .form-field textarea:focus,
+    .form-field select:focus { border-color: var(--ember); }
+
+    .form-field textarea { min-height: 88px; resize: vertical; }
+
+    .form-err {
+      color: var(--ember);
+      font-size: 0.82rem;
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    .modal-submit {
+      background: var(--ember);
+      color: var(--parchment);
+      border: none;
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 11px;
+      width: 100%;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: all 0.18s;
+      margin-top: 4px;
+    }
+
+    .modal-submit:hover { background: var(--forge); }
+
+    .modal-cancel {
+      background: none;
+      color: var(--smoke);
+      border: 1px solid var(--parchment-deep);
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      padding: 9px;
+      width: 100%;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: all 0.18s;
+      margin-top: 7px;
+    }
+
+    .modal-cancel:hover { border-color: var(--smoke); }
+
+    .demo-hint {
+      margin-top: 14px;
+      font-size: 0.78rem;
+      color: var(--ash);
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* ── NAV LOGIN BTN ── */
+    .nav-login {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      background: var(--ember);
+      color: var(--parchment) !important;
+      padding: 6px 14px !important;
+      border-radius: 2px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.18s;
+    }
+
+    .nav-login:hover { background: var(--forge) !important; }
+    .nav-login.logout { background: var(--ore-mid) !important; }
+
+    /* ── TOAST ── */
+    .toast-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--ore);
+      color: var(--parchment);
+      padding: 10px 22px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.06em;
+      border-left: 4px solid var(--gold);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+      z-index: 900;
+      opacity: 0;
+      transition: all 0.28s ease;
+      white-space: nowrap;
+    }
+
+    .toast-bar.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ── ADMIN DASHBOARD ── */
+    #admin-section {
+      background: var(--parchment);
+      padding: 4rem 0;
+      display: none;
+    }
+
+    #admin-section.visible { display: block; }
+
+    .dash-tabs {
+      display: flex;
+      gap: 2px;
+      border-bottom: 2px solid var(--parchment-deep);
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .dash-tab {
+      background: none;
+      border: none;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      padding: 9px 16px;
+      cursor: pointer;
+      color: var(--smoke);
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      text-transform: uppercase;
+      transition: all 0.18s;
+    }
+
+    .dash-tab.active { color: var(--ember); border-bottom-color: var(--ember); }
+    .dash-tab:not(.active):hover { color: var(--ore); }
+
+    .tw { overflow-x: auto; }
+
+    .dash-table { width: 100%; border-collapse: collapse; font-size: 0.93rem; }
+    .dash-table th {
+      font-family: 'Cinzel', serif;
+      font-size: 0.67rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--smoke);
+      padding: 9px 12px;
+      border-bottom: 2px solid var(--parchment-deep);
+      text-align: left;
+    }
+    .dash-table td { padding: 11px 12px; border-bottom: 1px solid var(--parchment-deep); vertical-align: middle; }
+    .dash-table tr:hover td { background: rgba(200,120,10,0.04); }
+
+    .tbl-btn {
+      background: none;
+      border: 1px solid currentColor;
+      padding: 3px 9px;
+      cursor: pointer;
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border-radius: 2px;
+      transition: all 0.18s;
+      margin-right: 3px;
+    }
+    .tbl-btn.edit { color: var(--ember); }
+    .tbl-btn.edit:hover { background: var(--ember); color: var(--parchment); }
+    .tbl-btn.del { color: #8b0000; }
+    .tbl-btn.del:hover { background: #8b0000; color: var(--parchment); }
+
+    .add-btn {
+      background: var(--ember);
+      color: var(--parchment);
+      border: none;
+      font-family: 'Cinzel', serif;
+      font-size: 0.73rem;
+      font-weight: 600;
+      padding: 8px 16px;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: 2px;
+      transition: all 0.18s;
+    }
+    .add-btn:hover { background: var(--forge); }
+
+    .cat-badge {
+      background: var(--forge);
+      color: var(--parchment);
+      padding: 2px 8px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.64rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--parchment-deep);
+      border-top: 4px solid var(--ember);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      color: var(--ember);
+      font-weight: 700;
+    }
+
+    .stat-lbl {
+      font-size: 0.7rem;
+      color: var(--smoke);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* ── MEMBER AREA ── */
+    #member-section {
+      background: var(--parchment);
+      padding: 4rem 0;
+      display: none;
+    }
+    #member-section.visible { display: block; }
+
+    .member-card {
+      background: var(--parchment-deep);
+      border-top: 4px solid var(--ember);
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+
+    .member-card h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      color: var(--ore);
+      margin-bottom: 12px;
+    }
+
+    /* ── SHOP ── */
+    #butikk {
+      background: var(--parchment-deep);
+      padding: 5rem 0;
+    }
+
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 18px;
+    }
+
+    .prod-card {
+      background: var(--parchment);
+      border: 1px solid rgba(92,58,30,0.18);
+      padding: 20px;
+      text-align: center;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .prod-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .prod-emoji { font-size: 2.6rem; margin-bottom: 10px; }
+    .prod-cat { font-size: 0.65rem; font-family: 'Cinzel', serif; color: var(--ash); letter-spacing: 0.15em; text-transform: uppercase; }
+    .prod-name { font-family: 'Cinzel', serif; font-size: 0.95rem; color: var(--ore); margin: 6px 0; line-height: 1.3; }
+    .prod-desc { font-size: 0.85rem; color: var(--smoke); font-style: italic; margin-bottom: 12px; line-height: 1.5; flex: 1; }
+    .prod-price { font-family: 'Cinzel', serif; font-size: 1.2rem; color: var(--ember); font-weight: 600; margin-bottom: 4px; }
+    .prod-stock { font-size: 0.7rem; color: var(--ash); margin-bottom: 12px; }
+
+    .atc-btn {
+      background: var(--ember);
+      color: var(--parchment);
+      border: none;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      width: 100%;
+      transition: all 0.18s;
+    }
+    .atc-btn:hover { background: var(--forge); }
+
+    /* ── CART ── */
+    .cart-panel {
+      position: fixed;
+      right: 0; top: 0; bottom: 0;
+      width: 340px;
+      background: var(--parchment);
+      box-shadow: -4px 0 24px rgba(0,0,0,0.2);
+      z-index: 600;
+      overflow-y: auto;
+      padding: 24px;
+      transform: translateX(100%);
+      transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+    }
+    .cart-panel.open { transform: translateX(0); }
+    .cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 599; display: none; }
+    .cart-overlay.open { display: block; }
+    .cart-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--ember); padding-bottom: 12px; margin-bottom: 18px; }
+    .cart-head-title { font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--ore); }
+    .cart-close-btn { background: none; border: none; cursor: pointer; color: var(--smoke); font-size: 1.1rem; }
+    .cart-item { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--parchment-deep); }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--ore); }
+    .cart-item-price { font-size: 0.88rem; color: var(--ember); margin-top: 2px; }
+    .cart-rm { background: none; border: none; color: var(--ash); cursor: pointer; font-size: 1rem; padding: 2px 5px; }
+    .cart-rm:hover { color: var(--ember); }
+    .cart-total-row { font-family: 'Cinzel', serif; font-size: 1rem; color: var(--ore); padding: 14px 0; text-align: right; }
+    .cart-checkout { background: var(--ore); color: var(--parchment); border: none; font-family: 'Cinzel', serif; font-size: 0.8rem; font-weight: 600; padding: 12px; width: 100%; cursor: pointer; letter-spacing: 0.1em; text-transform: uppercase; transition: all 0.18s; margin-top: 6px; }
+    .cart-checkout:hover { background: var(--ember); }
+    .cart-badge { background: var(--ember); color: var(--parchment); border-radius: 50%; width: 16px; height: 16px; font-size: 0.62rem; display: inline-flex; align-items: center; justify-content: center; margin-left: 3px; font-family: 'Cinzel', serif; vertical-align: middle; }
+
+    /* ── SWORD HEIGHT INFO BOX ── */
+    .sword-info {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(139,69,19,0.1);
+      border: 1px solid rgba(139,69,19,0.3);
+      color: var(--forge);
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    @media (max-width: 600px) {
+      .gallery-grid { columns: 2 140px; }
+      .lightbox-prev, .lightbox-next { width: 36px; height: 52px; font-size: 1rem; }
+    }
 
     /* ── PRACTICAL ── */
     #praktisk {
@@ -850,8 +1427,11 @@
     <li><a href="#aktiviteter">Aktiviteter</a></li>
     <li><a href="#galleri">Galleri</a></li>
     <li><a href="#blogg">Blogg</a></li>
+    <li><a href="#butikk">Butikk</a></li>
     <li><a href="#praktisk">Praktisk</a></li>
     <li><a href="#vedtekter">Vedtekter</a></li>
+    <li><button id="cartNavBtn" onclick="toggleCart()" style="background:none;border:none;cursor:pointer;font-size:1rem;color:var(--parchment);padding:0;" aria-label="Handlekurv">🧺 <span id="cartBadge" class="cart-badge" style="display:none;">0</span></button></li>
+    <li><button class="nav-login" id="loginNavBtn" onclick="openLoginModal()">Logg inn</button></li>
     <li><a href="#kontakt" class="nav-cta">Kontakt</a></li>
   </ul>
 
@@ -1074,7 +1654,7 @@
 <!-- ── EVENTS BANNER ── -->
 <div class="events-banner">
   <div class="container">
-    <span class="section-label" data-reveal>Høydepunkter 2025</span>
+    <span class="section-label" data-reveal>Høydepunkter 2026</span>
     <h2 class="section-title" data-reveal data-reveal-delay="1">Spesielle arrangementer</h2>
     <p style="color: rgba(245,237,216,0.65); max-width: 480px; margin: 0 auto; font-style: italic;" data-reveal data-reveal-delay="2">
       Gjennom sesongen arrangeres det temadager, gilder og spesialeventer.
@@ -1095,42 +1675,126 @@
     <div class="gallery-header">
       <span class="section-label" data-reveal>Bildegalleri</span>
       <h2 class="section-title" data-reveal data-reveal-delay="1">Livet i Kaupang</h2>
+      <p style="color:var(--parchment); opacity:0.6; font-style:italic; margin-top:8px; font-size:0.95rem;" data-reveal data-reveal-delay="2">Klikk på et bilde for å se det i fullskjerm — bruk piltaster for å navigere</p>
     </div>
 
-    <div class="gallery-grid" role="list" aria-label="Bildegalleri fra Kaupang Vikingby">
-      <div class="gallery-item gi-1" role="listitem">
-        <img src="486378000_1268307251412842_4765331026409535870_n.jpg" alt="Kaupang Vikingby" loading="lazy" />
+    <div class="gallery-grid" role="list" aria-label="Bildegalleri fra Kaupang Vikingby" id="galleryGrid">
+      <div class="gallery-item" role="listitem" data-idx="0">
+        <img src="486378000_1268307251412842_4765331026409535870_n.jpg" alt="Kaupang Vikingby sommersesong" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Kaupang Vikingby sommersesong</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
       </div>
-      <div class="gallery-item gi-2" role="listitem">
+      <div class="gallery-item" role="listitem" data-idx="1">
         <img src="482981256_1112068760931415_2339010088343867687_n.jpg" alt="Håndverk i Kaupang" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Tradisjonelt håndverk</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
       </div>
-      <div class="gallery-item gi-3" role="listitem">
-        <img src="469422841_1184733336436901_6845985270608470615_n.jpg" alt="Vikingaktiviteter" loading="lazy" />
+      <div class="gallery-item" role="listitem" data-idx="2">
+        <img src="469422841_1184733336436901_6845985270608470615_n.jpg" alt="Vikingaktiviteter for hele familien" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Vikingaktiviteter for hele familien</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
       </div>
-      <div class="gallery-item gi-4" role="listitem">
-        <img src="473532891_1220257646217803_2271056343226977891_n.jpg" alt="Smiing og håndverk" loading="lazy" />
+      <div class="gallery-item" role="listitem" data-idx="3">
+        <img src="473532891_1220257646217803_2271056343226977891_n.jpg" alt="Smiing og håndverk ved esse" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Smiing ved essen</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
       </div>
-      <div class="gallery-item gi-5" role="listitem">
+      <div class="gallery-item" role="listitem" data-idx="4">
         <img src="485457960_1268307088079525_473446680612391659_n.jpg" alt="Langhus og vikingmiljø i Kaupang" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Langhus og vikingmiljø</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
       </div>
-      <div class="gallery-item gi-6" role="listitem">
+      <div class="gallery-item" role="listitem" data-idx="5">
         <img src="484064461_1112068910931400_4772206154571094046_n.jpg" alt="Besøkende i Kaupang Vikingby" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Besøkende i Kaupang</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
       </div>
-      <div class="gallery-item gi-7" role="listitem">
-        <img src="486490523_1268307248079509_2150256045530001009_n.jpg" alt="Aktiviteter i Kaupang" loading="lazy" />
+      <div class="gallery-item" role="listitem" data-idx="6">
+        <img src="486490523_1268307248079509_2150256045530001009_n.jpg" alt="Aktiviteter og demonstrasjoner" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Aktiviteter og demonstrasjoner</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
       </div>
-      <div class="gallery-item gi-8" role="listitem">
+      <div class="gallery-item" role="listitem" data-idx="7">
         <img src="474208852_1219511972959037_2249145386161493641_n.jpg" alt="Vikingdag i Kaupang" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">En dag i vikingtiden</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
       </div>
-      <div class="gallery-item gi-9" role="listitem">
+      <div class="gallery-item" role="listitem" data-idx="8">
         <img src="487313157_1275634577346776_1207947708730738662_n.jpg" alt="Håndverk og tradisjon" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Håndverk og tradisjon</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
       </div>
-      <div class="gallery-item gi-10" role="listitem">
-        <img src="518396361_1366968628213370_8582473837966254396_n.jpg" alt="Kaupang sommersesong" loading="lazy" />
+      <div class="gallery-item" role="listitem" data-idx="9">
+        <img src="518396361_1366968628213370_8582473837966254396_n.jpg" alt="Kaupang – Norges første by" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Kaupang – Norges første by</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
+      </div>
+      <div class="gallery-item" role="listitem" data-idx="10">
+        <img src="482984923_1112068950931396_9146093029536672344_n.jpg" alt="Håndverker med tradisjonelt verktøy" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Tradisjonelt verktøy i bruk</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
+      </div>
+      <div class="gallery-item" role="listitem" data-idx="11">
+        <img src="482988048_1112068927598065_2787653128352952883_n.jpg" alt="Detaljer fra vikingtidens håndverk" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Detaljer fra vikingtidens håndverk</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
+      </div>
+      <div class="gallery-item" role="listitem" data-idx="12">
+        <img src="482986089_1112069134264711_17144988095088101_n.jpg" alt="Livet i Kaupang Vikingby" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Livet i Kaupang</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
+      </div>
+      <div class="gallery-item" role="listitem" data-idx="13">
+        <img src="482979157_1112069187598039_911622957533792474_n.jpg" alt="Autentiske vikingtidsopplevelser" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Autentiske opplevelser</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
+      </div>
+      <div class="gallery-item" role="listitem" data-idx="14">
+        <img src="484179163_1112069064264718_2843504623821361573_n.jpg" alt="Fellesskap og formidling" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Fellesskap og formidling</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
+      </div>
+      <div class="gallery-item" role="listitem" data-idx="15">
+        <img src="482987492_1112069054264719_42706491513147420_n.jpg" alt="Vikingbyens håndverkere" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Vikingbyens håndverkere</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
+      </div>
+      <div class="gallery-item" role="listitem" data-idx="16">
+        <img src="469547653_1184733453103556_6477998865793859350_n.jpg" alt="Vikingbyen i Larvik" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Vikingbyen i Larvik</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
+      </div>
+      <div class="gallery-item" role="listitem" data-idx="17">
+        <img src="486520424_1268307091412858_1134277677278713462_n.jpg" alt="Vikingkultur og arv" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Vikingkultur og arv</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
+      </div>
+      <div class="gallery-item" role="listitem" data-idx="18">
+        <img src="513861764_1351909526385947_7463804014211033962_n.jpg" alt="Kaupang sommersesong 2026" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Sommersesong 2026</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
+      </div>
+      <div class="gallery-item" role="listitem" data-idx="19">
+        <img src="514491194_1351909726385927_8207666184154367586_n.jpg" alt="Vikingbyen åpner igjen" loading="lazy" />
+        <div class="gallery-overlay"><span class="gallery-caption">Vikingbyen åpner igjen</span></div>
+        <span class="gallery-zoom-icon">⤢</span>
       </div>
     </div>
   </div>
 </section>
+
+<!-- ── LIGHTBOX ── -->
+<div id="lightbox" class="lightbox" style="display:none;" role="dialog" aria-modal="true" aria-label="Bildefremviser">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lbClose" aria-label="Lukk">✕</button>
+    <img class="lightbox-img" id="lbImg" src="" alt="" />
+    <p class="lightbox-caption" id="lbCaption"></p>
+    <p class="lightbox-counter" id="lbCounter"></p>
+    <div class="lightbox-thumbs" id="lbThumbs"></div>
+  </div>
+  <button class="lightbox-prev" id="lbPrev" aria-label="Forrige bilde">‹</button>
+  <button class="lightbox-next" id="lbNext" aria-label="Neste bilde">›</button>
+</div>
 
 <!-- ── PRACTICAL ── -->
 <section id="praktisk">
@@ -1153,7 +1817,7 @@
             Åpningstider
           </h3>
           <table class="info-table">
-            <tr><td>Sesong</td><td>24. juni – 30. august 2025</td></tr>
+            <tr><td>Sesong</td><td>24. juni – 30. august 2026</td></tr>
             <tr><td>Tirsdag–søndag</td><td>kl. 10:00 – 17:00</td></tr>
             <tr><td>Mandag</td><td>Stengt</td></tr>
             <tr><td>Omvisninger</td><td>Daglig i åpningstiden</td></tr>
@@ -1203,9 +1867,10 @@
             <p class="ticket-desc">Inkluderer guidet omvisning og alle aktiviteter</p>
           </div>
           <div class="ticket-card">
-            <span class="ticket-type">Barn under 16 år</span>
+            <span class="ticket-type">Barn til sverdhøyde</span>
             <span class="ticket-price">Gratis</span>
-            <p class="ticket-desc">Alle barn er velkomne uten billettpris</p>
+            <p class="ticket-desc">⚔️ Barn som ikke rekker et vikingsverds hjalt er alltid gratis</p>
+            <span class="sword-info">⚔️ Ca. 90–100 cm – prøv ved inngangen!</span>
           </div>
           <div class="ticket-card">
             <span class="ticket-type">Grupper</span>
@@ -1415,10 +2080,131 @@
   </div>
 </section>
 
+<!-- ── BUTIKK ── -->
+<section id="butikk">
+  <div class="container">
+    <div style="text-align:center; margin-bottom:3rem;">
+      <span class="section-label" data-reveal>Nettbutikk</span>
+      <h2 class="section-title" data-reveal data-reveal-delay="1">Vikingbutikken</h2>
+      <div class="divider divider-center" data-reveal data-reveal-delay="2"></div>
+      <p style="color:var(--smoke); font-style:italic; margin-top:1rem;" data-reveal data-reveal-delay="2">Autentiske produkter og opplevelser fra Kaupang</p>
+    </div>
+    <div class="shop-grid" id="shopGrid"></div>
+    <div id="adminAddProdBtn" style="display:none; text-align:right; margin-top:1.5rem;">
+      <button class="add-btn" onclick="openNewProductModal()">+ Legg til vare</button>
+    </div>
+  </div>
+</section>
+
+<!-- ── ADMIN ── -->
+<section id="admin-section">
+  <div class="container">
+    <h2 style="font-family:'Cinzel',serif;font-size:1.8rem;color:var(--ore);margin-bottom:6px;">Administrasjon</h2>
+    <p style="color:var(--smoke);font-style:italic;margin-bottom:24px;" id="adminSubTitle"></p>
+    <div class="dash-tabs">
+      <button class="dash-tab active" onclick="switchDashTab('artikler',this)">📰 Artikler</button>
+      <button class="dash-tab" onclick="switchDashTab('produkter',this)">🛒 Produkter</button>
+      <button class="dash-tab" onclick="switchDashTab('oversikt',this)">📊 Oversikt</button>
+    </div>
+    <div id="dashArtikler">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:14px;"><button class="add-btn" onclick="openNewArticleModal()">+ Ny artikkel</button></div>
+      <div class="tw"><table class="dash-table" id="artTable"></table></div>
+    </div>
+    <div id="dashProdukter" style="display:none;">
+      <div style="display:flex;justify-content:flex-end;margin-bottom:14px;"><button class="add-btn" onclick="openNewProductModal()">+ Legg til vare</button></div>
+      <div class="tw"><table class="dash-table" id="prodTable"></table></div>
+    </div>
+    <div id="dashOversikt" style="display:none;">
+      <div class="stat-grid" id="statGrid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── MEMBER ── -->
+<section id="member-section">
+  <div class="container">
+    <h2 style="font-family:'Cinzel',serif;font-size:1.8rem;color:var(--ore);margin-bottom:6px;" id="memberTitle"></h2>
+    <div id="memberContent"></div>
+  </div>
+</section>
+
+<!-- ── LOGIN MODAL ── -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal-box">
+    <h2>Innlogging</h2>
+    <span class="modal-sub">Kaupang Vikingby</span>
+    <div class="form-field"><label>Brukernavn</label><input id="loginUser" placeholder="admin eller medlem" /></div>
+    <div class="form-field"><label>Passord</label><input id="loginPass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" /></div>
+    <div id="loginErr" class="form-err" style="display:none;"></div>
+    <button class="modal-submit" onclick="doLogin()">Logg inn</button>
+    <button class="modal-cancel" onclick="closeModal('loginModal')">Avbryt</button>
+    <p class="demo-hint">Demo: admin / admin123 · eller · medlem / medlem123</p>
+  </div>
+</div>
+
+<!-- ── ARTICLE MODAL ── -->
+<div class="modal-overlay" id="artModal">
+  <div class="modal-box wide">
+    <h2 id="artModalTitle">Ny artikkel</h2>
+    <input type="hidden" id="artModalId" value="" />
+    <div class="form-field"><label>Kategori</label>
+      <select id="artModalCat">
+        <option>Arkeologi</option><option>Sosialhistorie</option><option>Mat og oppskrifter</option>
+        <option>Handel</option><option>Fakta</option><option>Arrangement</option><option>Nyheter</option>
+      </select>
+    </div>
+    <div class="form-field"><label>Tittel</label><input id="artModalTittel" /></div>
+    <div class="form-field"><label>Ingress</label><textarea id="artModalIngress" rows="2"></textarea></div>
+    <div class="form-field"><label>Innhold</label><textarea id="artModalInnhold" rows="6"></textarea></div>
+    <div id="artModalErr" class="form-err" style="display:none;">Fyll inn tittel og innhold</div>
+    <button class="modal-submit" onclick="saveArticle()">Lagre artikkel</button>
+    <button class="modal-cancel" onclick="closeModal('artModal')">Avbryt</button>
+  </div>
+</div>
+
+<!-- ── PRODUCT MODAL ── -->
+<div class="modal-overlay" id="prodModal">
+  <div class="modal-box wide">
+    <h2 id="prodModalTitle">Ny vare</h2>
+    <input type="hidden" id="prodModalId" value="" />
+    <div class="form-field"><label>Ikon</label>
+      <div id="emojiPicker" style="display:flex;flex-wrap:wrap;gap:6px;padding:4px 0;"></div>
+      <input type="hidden" id="prodModalEmoji" value="🛒" />
+    </div>
+    <div class="form-field"><label>Varenavn</label><input id="prodModalNavn" /></div>
+    <div class="form-field"><label>Kategori</label><input id="prodModalKat" /></div>
+    <div class="form-field"><label>Beskrivelse</label><textarea id="prodModalBeskr" rows="2"></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="form-field"><label>Pris (kr)</label><input type="number" id="prodModalPris" /></div>
+      <div class="form-field"><label>Lager (stk)</label><input type="number" id="prodModalLager" value="10" /></div>
+    </div>
+    <div id="prodModalErr" class="form-err" style="display:none;">Fyll inn navn og pris</div>
+    <button class="modal-submit" onclick="saveProduct()">Lagre vare</button>
+    <button class="modal-cancel" onclick="closeModal('prodModal')">Avbryt</button>
+  </div>
+</div>
+
+<!-- ── CART ── -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-head">
+    <span class="cart-head-title">🧺 Handlekurv</span>
+    <button class="cart-close-btn" onclick="toggleCart()">✕</button>
+  </div>
+  <div id="cartItems"><p style="color:var(--smoke);font-style:italic;">Handlekurven er tom</p></div>
+  <div id="cartTotalRow" style="display:none;">
+    <div class="cart-total-row">Totalt: <strong id="cartTotalVal"></strong></div>
+    <button class="cart-checkout" onclick="checkout()">Gå til kassen</button>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast-bar" id="toastBar"></div>
+
 <!-- ── FOOTER ── -->
 <footer>
   <p>
-    © 2025 Kaupang Vikingby · Kaupangveien 276, 3261 Larvik ·
+    © 2026 Kaupang Vikingby · Kaupangveien 276, 3261 Larvik ·
     <a href="mailto:post@kaupangprosjektet.no">post@kaupangprosjektet.no</a> ·
     <a href="tel:+4790622744">+47 906 22 744</a>
   </p>
@@ -1428,15 +2214,13 @@
 </footer>
 
 <script>
-  // Hamburger menu
+  // ── NAV ──────────────────────────────────────────────────────
   const hamburger = document.getElementById('hamburger');
   const navLinks = document.getElementById('navLinks');
   hamburger.addEventListener('click', () => {
     const open = navLinks.classList.toggle('open');
     hamburger.setAttribute('aria-expanded', open);
   });
-
-  // Close menu on link click
   navLinks.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
       navLinks.classList.remove('open');
@@ -1448,20 +2232,457 @@
   const reveals = document.querySelectorAll('[data-reveal]');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
     });
   }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
-
   reveals.forEach(el => observer.observe(el));
 
-  // Nav shrink on scroll
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => {
     navbar.style.height = window.scrollY > 60 ? '60px' : '72px';
   }, { passive: true });
+
+  // ── TOAST ────────────────────────────────────────────────────
+  let toastTimer;
+  function toast(msg) {
+    const t = document.getElementById('toastBar');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // ── MODALS ───────────────────────────────────────────────────
+  function openModal(id) { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  document.querySelectorAll('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  });
+
+  // ── AUTH ─────────────────────────────────────────────────────
+  const USERS = {
+    admin: { password: 'admin123', role: 'admin', name: 'Administrator' },
+    medlem: { password: 'medlem123', role: 'member', name: 'Åse Vikingdatter' }
+  };
+
+  let currentUser = null;
+
+  function openLoginModal() { openModal('loginModal'); setTimeout(()=>document.getElementById('loginUser').focus(),100); }
+
+  function doLogin() {
+    const u = document.getElementById('loginUser').value.trim().toLowerCase();
+    const p = document.getElementById('loginPass').value;
+    const err = document.getElementById('loginErr');
+    const user = USERS[u];
+    if (user && user.password === p) {
+      currentUser = { username: u, ...user };
+      closeModal('loginModal');
+      document.getElementById('loginUser').value = '';
+      document.getElementById('loginPass').value = '';
+      err.style.display = 'none';
+      updateAuthUI();
+      toast('Velkommen, ' + currentUser.name + '!');
+      if (currentUser.role === 'admin') { showAdmin(); }
+      else { showMember(); }
+    } else {
+      err.textContent = 'Feil brukernavn eller passord';
+      err.style.display = 'block';
+    }
+  }
+
+  function doLogout() {
+    currentUser = null;
+    updateAuthUI();
+    document.getElementById('admin-section').classList.remove('visible');
+    document.getElementById('member-section').classList.remove('visible');
+    document.getElementById('adminAddProdBtn').style.display = 'none';
+    renderShop();
+    toast('Du er logget ut');
+  }
+
+  function updateAuthUI() {
+    const btn = document.getElementById('loginNavBtn');
+    if (currentUser) {
+      btn.textContent = 'Logg ut (' + currentUser.name.split(' ')[0] + ')';
+      btn.classList.add('logout');
+      btn.onclick = doLogout;
+    } else {
+      btn.textContent = 'Logg inn';
+      btn.classList.remove('logout');
+      btn.onclick = openLoginModal;
+    }
+  }
+
+  // ── SHOP DATA ────────────────────────────────────────────────
+  let products = [
+    { id: 1, name: 'Vikingperle – håndlaget glassperlesmykke', price: 249, description: 'Håndlaget etter tradisjonelle metoder, inspirert av arkeologiske funn fra Kaupang.', category: 'Smykker', stock: 12, image: '🪬' },
+    { id: 2, name: 'Kaupang – Norges første by (bok)', price: 349, description: 'Grundig gjennomgang av arkeologien og historien bak Kaupang. Faglig og leseverdig.', category: 'Bøker', stock: 8, image: '📖' },
+    { id: 3, name: 'Vikingkniv – håndtempret jern', price: 895, description: 'Smidd i Kaupangs smie av erfarne håndverkere. Trehanskjeft og lærslire.', category: 'Håndverk', stock: 5, image: '🗡️' },
+    { id: 4, name: 'Vikingmjød – 50 cl', price: 179, description: 'Brygget etter gammel oppskrift med norsk honning og urter fra Vestfold.', category: 'Mat og drikke', stock: 20, image: '🍯' },
+    { id: 5, name: 'Inngang – Voksen (forhåndsbestilling)', price: 110, description: 'Inkluderer guidet omvisning og alle daglige aktiviteter.', category: 'Billetter', stock: 999, image: '🎫' },
+  ];
+
+  function renderShop() {
+    const grid = document.getElementById('shopGrid');
+    const isAdmin = currentUser?.role === 'admin';
+    grid.innerHTML = products.map(p => `
+      <div class="prod-card">
+        <div class="prod-emoji">${p.image}</div>
+        <div class="prod-cat">${p.category}</div>
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-desc">${p.description}</div>
+        <div class="prod-price">${p.price} kr</div>
+        <div class="prod-stock">På lager: ${p.stock} stk</div>
+        <button class="atc-btn" onclick="addToCart(${p.id})">Legg i kurv</button>
+        ${isAdmin ? `<div style="display:flex;gap:4px;margin-top:8px;"><button class="tbl-btn edit" style="flex:1" onclick="openEditProductModal(${p.id})">Rediger</button><button class="tbl-btn del" style="flex:1" onclick="deleteProduct(${p.id})">Slett</button></div>` : ''}
+      </div>
+    `).join('');
+    if (isAdmin) document.getElementById('adminAddProdBtn').style.display = 'block';
+  }
+
+  // ── CART ─────────────────────────────────────────────────────
+  let cart = [];
+
+  function addToCart(productId) {
+    const p = products.find(x => x.id === productId);
+    if (!p) return;
+    const ex = cart.find(i => i.id === productId);
+    if (ex) ex.qty++;
+    else cart.push({ ...p, qty: 1 });
+    renderCart();
+    toast(p.name + ' lagt i kurv');
+  }
+
+  function removeFromCart(id) {
+    cart = cart.filter(i => i.id !== id);
+    renderCart();
+  }
+
+  function renderCart() {
+    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    const count = cart.reduce((s, i) => s + i.qty, 0);
+    const badge = document.getElementById('cartBadge');
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'inline-flex' : 'none';
+
+    const itemsEl = document.getElementById('cartItems');
+    const totalRow = document.getElementById('cartTotalRow');
+    if (cart.length === 0) {
+      itemsEl.innerHTML = '<p style="color:var(--smoke);font-style:italic;">Handlekurven er tom</p>';
+      totalRow.style.display = 'none';
+    } else {
+      itemsEl.innerHTML = cart.map(i => `
+        <div class="cart-item">
+          <span style="font-size:1.4rem">${i.image}</span>
+          <div class="cart-item-info">
+            <div class="cart-item-name">${i.name}</div>
+            <div class="cart-item-price">${i.price * i.qty} kr${i.qty > 1 ? ` <span style="color:var(--ash);font-size:0.78rem">(${i.qty}×)</span>` : ''}</div>
+          </div>
+          <button class="cart-rm" onclick="removeFromCart(${i.id})">✕</button>
+        </div>
+      `).join('');
+      document.getElementById('cartTotalVal').textContent = total + ' kr';
+      totalRow.style.display = 'block';
+    }
+  }
+
+  function toggleCart() {
+    document.getElementById('cartPanel').classList.toggle('open');
+    document.getElementById('cartOverlay').classList.toggle('open');
+  }
+
+  function checkout() {
+    cart = [];
+    renderCart();
+    toggleCart();
+    toast('Bestilling mottatt! Vi tar kontakt på e-post.');
+  }
+
+  // ── ARTICLES ─────────────────────────────────────────────────
+  let articles = [
+    { id: 1, category: 'Arkeologi', title: 'Hvorfor akkurat her? Kaupangs strategiske plassering', excerpt: 'For 1200 år siden var Viksfjorden dypere og kysten nærmere. Slik valgte vikingene stedet for Norges første by.', content: 'Kaupang i Skiringssal ble grunnlagt ca. år 800, og beliggenheten inne i Viksfjorden var av avgjørende betydning. Sjøveien ga tilgang til handelsnettverket langs kysten, mens nærhet til høvdinggården Huseby sikret politisk beskyttelse og kontroll.', date: '2024-03-10' },
+    { id: 2, category: 'Arkeologi', title: 'Glassperlen fra Kaukasus', excerpt: 'Ikke større enn en ert — men den lille perlen har reist lenger enn de fleste mennesker gjorde i hele livet på 800-tallet.', content: 'Blant de over 100 000 gjenstandene funnet på Kaupang finnes glassperlene som kanskje forteller den mest fantastiske historien. Råmaterialet kom fra Kaukasus, ble smeltet og formet til perler i Kaupang.', date: '2024-02-20' },
+    { id: 3, category: 'Sosialhistorie', title: 'Kvinnene i Kaupang', excerpt: 'Gravfunnene avslører: Kvinner i handelsbyen hadde rikdom, status og forbindelser til hele Europa.', content: 'Arkeologiske funn fra gravfeltene rundt Kaupang tegner et bilde av kvinner med høy status og bred internasjonal kontakt. Gravgodset inkluderer frankisk keramikk, arabiske sølvmynter og skandinaviske smykker av høy kvalitet.', date: '2024-01-15' },
+  ];
+
+  function renderArticleTable() {
+    const t = document.getElementById('artTable');
+    t.innerHTML = `<thead><tr><th>Kategori</th><th>Tittel</th><th>Dato</th><th>Handlinger</th></tr></thead><tbody>` +
+      articles.map(a => `<tr>
+        <td><span class="cat-badge">${a.category}</span></td>
+        <td><strong>${a.title}</strong></td>
+        <td style="color:var(--ash);font-size:0.83rem">${a.date}</td>
+        <td><button class="tbl-btn edit" onclick="openEditArticleModal(${a.id})">Rediger</button><button class="tbl-btn del" onclick="deleteArticle(${a.id})">Slett</button></td>
+      </tr>`).join('') + `</tbody>`;
+  }
+
+  function openNewArticleModal() {
+    document.getElementById('artModalTitle').textContent = 'Ny artikkel';
+    document.getElementById('artModalId').value = '';
+    document.getElementById('artModalCat').value = 'Arkeologi';
+    document.getElementById('artModalTittel').value = '';
+    document.getElementById('artModalIngress').value = '';
+    document.getElementById('artModalInnhold').value = '';
+    document.getElementById('artModalErr').style.display = 'none';
+    openModal('artModal');
+  }
+
+  function openEditArticleModal(id) {
+    const a = articles.find(x => x.id === id);
+    if (!a) return;
+    document.getElementById('artModalTitle').textContent = 'Rediger artikkel';
+    document.getElementById('artModalId').value = id;
+    document.getElementById('artModalCat').value = a.category;
+    document.getElementById('artModalTittel').value = a.title;
+    document.getElementById('artModalIngress').value = a.excerpt;
+    document.getElementById('artModalInnhold').value = a.content;
+    document.getElementById('artModalErr').style.display = 'none';
+    openModal('artModal');
+  }
+
+  function saveArticle() {
+    const title = document.getElementById('artModalTittel').value.trim();
+    const content = document.getElementById('artModalInnhold').value.trim();
+    const err = document.getElementById('artModalErr');
+    if (!title || !content) { err.style.display = 'block'; return; }
+    const id = document.getElementById('artModalId').value;
+    const art = {
+      id: id ? parseInt(id) : Date.now(),
+      category: document.getElementById('artModalCat').value,
+      title, excerpt: document.getElementById('artModalIngress').value.trim(), content,
+      date: new Date().toISOString().split('T')[0]
+    };
+    if (id) { articles = articles.map(a => a.id === art.id ? art : a); }
+    else { articles.unshift(art); }
+    closeModal('artModal');
+    renderArticleTable();
+    renderStats();
+    toast('Artikkel lagret');
+  }
+
+  function deleteArticle(id) {
+    if (!confirm('Slette artikkelen?')) return;
+    articles = articles.filter(a => a.id !== id);
+    renderArticleTable();
+    renderStats();
+    toast('Artikkel slettet');
+  }
+
+  // ── PRODUCTS ADMIN ───────────────────────────────────────────
+  const EMOJIS = ['🪬','📖','🗡️','🍯','⚔️','🛡️','🏹','🪓','📿','🧶','🎫','🔨','🪤','💎','🪵','🧪'];
+
+  function buildEmojiPicker(selected) {
+    document.getElementById('emojiPicker').innerHTML = EMOJIS.map(e =>
+      `<button type="button" onclick="selectEmoji('${e}')" style="font-size:1.35rem;background:${e===selected?'var(--parchment-deep)':'none'};border:1px solid ${e===selected?'var(--ember)':'var(--parchment-deep)'};border-radius:4px;padding:3px 7px;cursor:pointer;" data-emoji="${e}">${e}</button>`
+    ).join('');
+    document.getElementById('prodModalEmoji').value = selected || '🛒';
+  }
+
+  function selectEmoji(e) {
+    document.getElementById('prodModalEmoji').value = e;
+    document.querySelectorAll('#emojiPicker button').forEach(b => {
+      const active = b.dataset.emoji === e;
+      b.style.background = active ? 'var(--parchment-deep)' : 'none';
+      b.style.borderColor = active ? 'var(--ember)' : 'var(--parchment-deep)';
+    });
+  }
+
+  function openNewProductModal() {
+    document.getElementById('prodModalTitle').textContent = 'Ny vare';
+    document.getElementById('prodModalId').value = '';
+    document.getElementById('prodModalNavn').value = '';
+    document.getElementById('prodModalKat').value = 'Håndverk';
+    document.getElementById('prodModalBeskr').value = '';
+    document.getElementById('prodModalPris').value = '';
+    document.getElementById('prodModalLager').value = '10';
+    document.getElementById('prodModalErr').style.display = 'none';
+    buildEmojiPicker('🛒');
+    openModal('prodModal');
+  }
+
+  function openEditProductModal(id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('prodModalTitle').textContent = 'Rediger vare';
+    document.getElementById('prodModalId').value = id;
+    document.getElementById('prodModalNavn').value = p.name;
+    document.getElementById('prodModalKat').value = p.category;
+    document.getElementById('prodModalBeskr').value = p.description;
+    document.getElementById('prodModalPris').value = p.price;
+    document.getElementById('prodModalLager').value = p.stock;
+    document.getElementById('prodModalErr').style.display = 'none';
+    buildEmojiPicker(p.image);
+    openModal('prodModal');
+  }
+
+  function saveProduct() {
+    const name = document.getElementById('prodModalNavn').value.trim();
+    const price = Number(document.getElementById('prodModalPris').value);
+    const err = document.getElementById('prodModalErr');
+    if (!name || !price) { err.style.display = 'block'; return; }
+    const id = document.getElementById('prodModalId').value;
+    const prod = {
+      id: id ? parseInt(id) : Date.now(),
+      name, price,
+      category: document.getElementById('prodModalKat').value.trim() || 'Håndverk',
+      description: document.getElementById('prodModalBeskr').value.trim(),
+      stock: Number(document.getElementById('prodModalLager').value) || 0,
+      image: document.getElementById('prodModalEmoji').value
+    };
+    if (id) { products = products.map(p => p.id === prod.id ? prod : p); }
+    else { products.push(prod); }
+    closeModal('prodModal');
+    renderShop();
+    renderProductTable();
+    renderStats();
+    toast('Vare lagret');
+  }
+
+  function deleteProduct(id) {
+    if (!confirm('Slette denne varen?')) return;
+    products = products.filter(p => p.id !== id);
+    renderShop();
+    renderProductTable();
+    renderStats();
+    toast('Vare slettet');
+  }
+
+  function renderProductTable() {
+    const t = document.getElementById('prodTable');
+    t.innerHTML = `<thead><tr><th>Vare</th><th>Kategori</th><th>Pris</th><th>Lager</th><th>Handlinger</th></tr></thead><tbody>` +
+      products.map(p => `<tr>
+        <td><span style="margin-right:8px">${p.image}</span><strong>${p.name}</strong></td>
+        <td style="color:var(--smoke)">${p.category}</td>
+        <td style="font-family:'Cinzel',serif;color:var(--ember);font-weight:600">${p.price} kr</td>
+        <td style="color:${p.stock<5?'var(--ember)':'var(--smoke)'}">${p.stock} stk</td>
+        <td><button class="tbl-btn edit" onclick="openEditProductModal(${p.id})">Rediger</button><button class="tbl-btn del" onclick="deleteProduct(${p.id})">Slett</button></td>
+      </tr>`).join('') + `</tbody>`;
+  }
+
+  function renderStats() {
+    const cartCount = cart.reduce((s,i)=>s+i.qty,0);
+    const cartTotal = cart.reduce((s,i)=>s+i.price*i.qty,0);
+    document.getElementById('statGrid').innerHTML = [
+      ['Artikler', articles.length, '📰'],
+      ['Produkter', products.length, '🛒'],
+      ['I handlekurv', cartCount, '🧺'],
+      ['Butikktotal', cartTotal + ' kr', '💰']
+    ].map(([l,v,i]) => `<div class="stat-card"><div style="font-size:1.8rem">${i}</div><div class="stat-val">${v}</div><div class="stat-lbl">${l}</div></div>`).join('');
+  }
+
+  // ── DASH TABS ────────────────────────────────────────────────
+  function switchDashTab(name, btn) {
+    ['dashArtikler','dashProdukter','dashOversikt'].forEach(id => document.getElementById(id).style.display = 'none');
+    document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('dash' + name.charAt(0).toUpperCase() + name.slice(1)).style.display = 'block';
+    btn.classList.add('active');
+    if (name === 'oversikt') renderStats();
+  }
+
+  // ── SHOW ADMIN / MEMBER ──────────────────────────────────────
+  function showAdmin() {
+    document.getElementById('adminSubTitle').textContent = 'Innlogget som ' + currentUser.name;
+    document.getElementById('admin-section').classList.add('visible');
+    document.getElementById('member-section').classList.remove('visible');
+    renderArticleTable();
+    renderProductTable();
+    renderShop();
+    document.getElementById('admin-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function showMember() {
+    const SCHEDULE = [
+      { day: 'Tirsdager', activity: 'Bueskyting', icon: '🏹' },
+      { day: 'Torsdager', activity: 'Vandring på Nordre Kaupang – fortelling, begravelser og arkeologi', icon: '🚶' },
+      { day: 'Fredager', activity: 'Arkeologisk graving', icon: '⛏️' },
+      { day: 'Søndager', activity: 'Fortellinger', icon: '📜' },
+    ];
+    document.getElementById('memberTitle').textContent = 'Hei, ' + currentUser.name + ' 👋';
+    document.getElementById('memberContent').innerHTML = `
+      <div class="member-card">
+        <h3>🏹 Ukentlig aktivitetsprogram (30. juni – 16. august)</h3>
+        ${SCHEDULE.map(s => `<div style="display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--parchment-deep)"><span style="font-size:1.2rem">${s.icon}</span><div><strong style="font-family:'Cinzel',serif;font-size:0.87rem">${s.day}: </strong><span style="color:var(--smoke)">${s.activity}</span></div></div>`).join('')}
+        <p style="color:var(--ash);font-size:0.8rem;margin-top:10px;font-style:italic">Kl. 11:00, 13:00 og 15:00 · 30–60 minutter</p>
+      </div>
+      <div class="member-card">
+        <h3>📰 Siste artikler</h3>
+        ${articles.slice(0,3).map(a => `<div style="padding:9px 0;border-bottom:1px solid var(--parchment-deep)"><span style="background:var(--forge);color:var(--parchment);padding:2px 7px;font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:.08em;text-transform:uppercase">${a.category}</span><p style="font-family:'Cinzel',serif;color:var(--ore);font-size:0.92rem;margin-top:6px">${a.title}</p></div>`).join('')}
+      </div>
+      <div class="member-card">
+        <h3>📬 Kontakt</h3>
+        <p><a href="mailto:post@kaupangprosjektet.no" style="color:var(--ember)">post@kaupangprosjektet.no</a> · <a href="tel:+4790622744" style="color:var(--ember)">+47 906 22 744</a></p>
+      </div>
+    `;
+    document.getElementById('member-section').classList.add('visible');
+    document.getElementById('admin-section').classList.remove('visible');
+    document.getElementById('member-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ── GALLERY LIGHTBOX ─────────────────────────────────────────
+  const galleryImages = Array.from(document.querySelectorAll('.gallery-item')).map(item => ({
+    src: item.querySelector('img').src,
+    alt: item.querySelector('.gallery-caption').textContent
+  }));
+
+  let lbIdx = 0;
+
+  function openLightbox(idx) {
+    lbIdx = idx;
+    const lb = document.getElementById('lightbox');
+    lb.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    renderLightbox();
+    // Build thumbs once
+    const thumbs = document.getElementById('lbThumbs');
+    thumbs.innerHTML = galleryImages.map((img, i) =>
+      `<img class="lb-thumb ${i===idx?'active':''}" src="${img.src}" alt="${img.alt}" data-i="${i}" onclick="goLightbox(${i})" />`
+    ).join('');
+  }
+
+  function closeLightbox() {
+    document.getElementById('lightbox').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function renderLightbox() {
+    const img = galleryImages[lbIdx];
+    document.getElementById('lbImg').src = img.src;
+    document.getElementById('lbImg').alt = img.alt;
+    document.getElementById('lbCaption').textContent = img.alt;
+    document.getElementById('lbCounter').textContent = (lbIdx + 1) + ' / ' + galleryImages.length;
+    document.querySelectorAll('.lb-thumb').forEach((t,i) => t.classList.toggle('active', i===lbIdx));
+  }
+
+  function goLightbox(idx) {
+    lbIdx = (idx + galleryImages.length) % galleryImages.length;
+    renderLightbox();
+    // Update thumb active
+    document.querySelectorAll('.lb-thumb').forEach((t,i) => t.classList.toggle('active', i===lbIdx));
+  }
+
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  document.getElementById('lbPrev').addEventListener('click', () => goLightbox(lbIdx - 1));
+  document.getElementById('lbNext').addEventListener('click', () => goLightbox(lbIdx + 1));
+  document.getElementById('lightbox').addEventListener('click', e => { if (e.target === document.getElementById('lightbox')) closeLightbox(); });
+
+  document.querySelectorAll('.gallery-item').forEach((item, i) => {
+    item.addEventListener('click', () => openLightbox(i));
+  });
+
+  document.addEventListener('keydown', e => {
+    const lb = document.getElementById('lightbox');
+    if (lb.style.display === 'none') return;
+    if (e.key === 'ArrowLeft') goLightbox(lbIdx - 1);
+    if (e.key === 'ArrowRight') goLightbox(lbIdx + 1);
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  // ── INIT ─────────────────────────────────────────────────────
+  renderShop();
+  renderCart();
 </script>
 </body>
 </html>

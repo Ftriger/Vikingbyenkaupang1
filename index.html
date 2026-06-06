@@ -2138,7 +2138,7 @@
     <div id="loginErr" class="form-err" style="display:none;"></div>
     <button class="modal-submit" onclick="doLogin()">Logg inn</button>
     <button class="modal-cancel" onclick="closeModal('loginModal')">Avbryt</button>
-    <p class="demo-hint">Demo: admin / admin123 · eller · medlem / medlem123</p>
+    <p class="demo-hint">ftriger · kaupang · eller · medlem</p>
   </div>
 </div>
 
@@ -2262,11 +2262,23 @@
     if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
   });
 
-  // ── AUTH ─────────────────────────────────────────────────────
-  const USERS = {
-    admin: { password: 'admin123', role: 'admin', name: 'Administrator' },
-    medlem: { password: 'medlem123', role: 'member', name: 'Åse Vikingdatter' }
+  // ── BRUKERDATA (lagres i localStorage) ──────────────────────
+  const DEFAULT_USERS = {
+    ftriger: { password: 'ftriger123', role: 'superadmin', name: 'Ftriger' },
+    kaupang: { password: 'kaupang123', role: 'admin', name: 'Kaupang Admin' },
+    medlem:  { password: 'medlem123',  role: 'member',     name: 'Medlem' }
   };
+
+  function getUsers() {
+    try {
+      const saved = localStorage.getItem('kv_users');
+      return saved ? JSON.parse(saved) : DEFAULT_USERS;
+    } catch(e) { return DEFAULT_USERS; }
+  }
+
+  function saveUsers(users) {
+    try { localStorage.setItem('kv_users', JSON.stringify(users)); } catch(e) {}
+  }
 
   let currentUser = null;
 
@@ -2276,7 +2288,8 @@
     const u = document.getElementById('loginUser').value.trim().toLowerCase();
     const p = document.getElementById('loginPass').value;
     const err = document.getElementById('loginErr');
-    const user = USERS[u];
+    const users = getUsers();
+    const user = users[u];
     if (user && user.password === p) {
       currentUser = { username: u, ...user };
       closeModal('loginModal');
@@ -2285,12 +2298,73 @@
       err.style.display = 'none';
       updateAuthUI();
       toast('Velkommen, ' + currentUser.name + '!');
-      if (currentUser.role === 'admin') { showAdmin(); }
+      if (currentUser.role === 'superadmin' || currentUser.role === 'admin') { showAdmin(); }
       else { showMember(); }
     } else {
       err.textContent = 'Feil brukernavn eller passord';
       err.style.display = 'block';
     }
+  }
+
+  // ── BYTT PASSORD ─────────────────────────────────────────────
+  function openChangePasswordModal() {
+    document.getElementById('cpCurrentPass').value = '';
+    document.getElementById('cpNewPass').value = '';
+    document.getElementById('cpNewPass2').value = '';
+    document.getElementById('cpErr').style.display = 'none';
+    document.getElementById('cpSuccess').style.display = 'none';
+    openModal('changePassModal');
+  }
+
+  function doChangePassword() {
+    const current = document.getElementById('cpCurrentPass').value;
+    const newp    = document.getElementById('cpNewPass').value;
+    const newp2   = document.getElementById('cpNewPass2').value;
+    const err     = document.getElementById('cpErr');
+    const ok      = document.getElementById('cpSuccess');
+    err.style.display = 'none';
+    ok.style.display = 'none';
+
+    const users = getUsers();
+    if (users[currentUser.username].password !== current) {
+      err.textContent = 'Nåværende passord er feil'; err.style.display = 'block'; return;
+    }
+    if (newp.length < 6) {
+      err.textContent = 'Nytt passord må være minst 6 tegn'; err.style.display = 'block'; return;
+    }
+    if (newp !== newp2) {
+      err.textContent = 'Passordene stemmer ikke'; err.style.display = 'block'; return;
+    }
+    users[currentUser.username].password = newp;
+    saveUsers(users);
+    currentUser.password = newp;
+    ok.style.display = 'block';
+    setTimeout(() => closeModal('changePassModal'), 1500);
+    toast('Passord oppdatert!');
+  }
+
+  // superadmin kan også resette andres passord
+  function openResetPassModal(username) {
+    document.getElementById('rpUsername').value = username;
+    document.getElementById('rpNewPass').value = '';
+    document.getElementById('rpErr').style.display = 'none';
+    document.getElementById('rpSuccess').style.display = 'none';
+    openModal('resetPassModal');
+  }
+
+  function doResetPassword() {
+    const username = document.getElementById('rpUsername').value;
+    const newp     = document.getElementById('rpNewPass').value;
+    const err      = document.getElementById('rpErr');
+    const ok       = document.getElementById('rpSuccess');
+    err.style.display = 'none'; ok.style.display = 'none';
+    if (newp.length < 6) { err.textContent = 'Minst 6 tegn'; err.style.display = 'block'; return; }
+    const users = getUsers();
+    users[username].password = newp;
+    saveUsers(users);
+    ok.style.display = 'block';
+    setTimeout(() => closeModal('resetPassModal'), 1500);
+    toast('Passord for ' + username + ' er tilbakestilt');
   }
 
   function doLogout() {
@@ -2575,22 +2649,134 @@
 
   // ── DASH TABS ────────────────────────────────────────────────
   function switchDashTab(name, btn) {
-    ['dashArtikler','dashProdukter','dashOversikt'].forEach(id => document.getElementById(id).style.display = 'none');
+    ['dashArtikler','dashProdukter','dashOversikt','dashPassord','dashBrukere'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
     document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
-    document.getElementById('dash' + name.charAt(0).toUpperCase() + name.slice(1)).style.display = 'block';
+    const panelId = 'dash' + name.charAt(0).toUpperCase() + name.slice(1);
+    const panel = document.getElementById(panelId);
+    if (panel) panel.style.display = 'block';
     btn.classList.add('active');
     if (name === 'oversikt') renderStats();
+    if (name === 'brukere') renderUserTable();
   }
 
   // ── SHOW ADMIN / MEMBER ──────────────────────────────────────
   function showAdmin() {
-    document.getElementById('adminSubTitle').textContent = 'Innlogget som ' + currentUser.name;
+    const isSuperAdmin = currentUser.role === 'superadmin';
+    document.getElementById('adminSubTitle').textContent = 'Innlogget som ' + currentUser.name + (isSuperAdmin ? ' · Hoved-admin' : '');
     document.getElementById('admin-section').classList.add('visible');
     document.getElementById('member-section').classList.remove('visible');
+
+    // Add/update password + user tabs
+    const tabs = document.querySelector('.dash-tabs');
+    if (!document.getElementById('tabPassord')) {
+      const passTab = document.createElement('button');
+      passTab.className = 'dash-tab';
+      passTab.id = 'tabPassord';
+      passTab.textContent = '🔑 Passord';
+      passTab.onclick = function() { switchDashTab('passord', this); };
+      tabs.appendChild(passTab);
+    }
+    if (isSuperAdmin && !document.getElementById('tabBrukere')) {
+      const userTab = document.createElement('button');
+      userTab.className = 'dash-tab';
+      userTab.id = 'tabBrukere';
+      userTab.textContent = '👥 Brukere';
+      userTab.onclick = function() { switchDashTab('brukere', this); };
+      tabs.appendChild(userTab);
+    }
+
+    // Add passord panel if missing
+    if (!document.getElementById('dashPassord')) {
+      const panel = document.createElement('div');
+      panel.id = 'dashPassord';
+      panel.style.display = 'none';
+      panel.innerHTML = `
+        <div style="max-width:420px;">
+          <h3 style="font-family:'Cinzel',serif;color:var(--ore);margin-bottom:20px;">Bytt ditt passord</h3>
+          <div class="form-field"><label>Nåværende passord</label><input type="password" id="cpCurrentPass" /></div>
+          <div class="form-field"><label>Nytt passord</label><input type="password" id="cpNewPass" /></div>
+          <div class="form-field"><label>Gjenta nytt passord</label><input type="password" id="cpNewPass2" /></div>
+          <div id="cpErr" class="form-err" style="display:none;"></div>
+          <div id="cpSuccess" style="display:none;color:green;font-style:italic;margin-bottom:8px;">✓ Passord oppdatert!</div>
+          <button class="modal-submit" onclick="doChangePasswordInline()">Oppdater passord</button>
+        </div>`;
+      document.getElementById('admin-section').querySelector('.container').appendChild(panel);
+    }
+
+    // Add brukere panel if missing (superadmin only)
+    if (isSuperAdmin && !document.getElementById('dashBrukere')) {
+      const panel = document.createElement('div');
+      panel.id = 'dashBrukere';
+      panel.style.display = 'none';
+      document.getElementById('admin-section').querySelector('.container').appendChild(panel);
+    }
+
     renderArticleTable();
     renderProductTable();
     renderShop();
     document.getElementById('admin-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function doChangePasswordInline() {
+    const current = document.getElementById('cpCurrentPass').value;
+    const newp    = document.getElementById('cpNewPass').value;
+    const newp2   = document.getElementById('cpNewPass2').value;
+    const err     = document.getElementById('cpErr');
+    const ok      = document.getElementById('cpSuccess');
+    err.style.display = 'none'; ok.style.display = 'none';
+    const users = getUsers();
+    if (users[currentUser.username].password !== current) {
+      err.textContent = 'Nåværende passord er feil'; err.style.display = 'block'; return;
+    }
+    if (newp.length < 6) { err.textContent = 'Minst 6 tegn kreves'; err.style.display = 'block'; return; }
+    if (newp !== newp2) { err.textContent = 'Passordene stemmer ikke overens'; err.style.display = 'block'; return; }
+    users[currentUser.username].password = newp;
+    saveUsers(users);
+    ok.style.display = 'block';
+    document.getElementById('cpCurrentPass').value = '';
+    document.getElementById('cpNewPass').value = '';
+    document.getElementById('cpNewPass2').value = '';
+    toast('✓ Passord oppdatert!');
+  }
+
+  function renderUserTable() {
+    const users = getUsers();
+    const panel = document.getElementById('dashBrukere');
+    if (!panel) return;
+    const roleLabel = { superadmin: '👑 Hoved-admin', admin: '⚙️ Admin', member: '👤 Medlem' };
+    panel.innerHTML = `
+      <h3 style="font-family:'Cinzel',serif;color:var(--ore);margin-bottom:20px;">Brukerstyring</h3>
+      <div class="tw"><table class="dash-table">
+        <thead><tr><th>Brukernavn</th><th>Navn</th><th>Rolle</th><th>Tilbakestill passord</th></tr></thead>
+        <tbody>
+          ${Object.entries(users).map(([uname, u]) => `
+            <tr>
+              <td><strong>${uname}</strong></td>
+              <td>${u.name}</td>
+              <td>${roleLabel[u.role] || u.role}</td>
+              <td>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <input type="password" id="rp_${uname}" placeholder="Nytt passord" style="border:1px solid var(--parchment-deep);padding:5px 8px;font-family:'Crimson Pro',serif;font-size:0.9rem;width:140px;" />
+                  <button class="tbl-btn edit" onclick="resetPassInline('${uname}')">Lagre</button>
+                </div>
+              </td>
+            </tr>`).join('')}
+        </tbody>
+      </table></div>`;
+  }
+
+  function resetPassInline(username) {
+    const input = document.getElementById('rp_' + username);
+    const newp = input.value.trim();
+    if (newp.length < 6) { toast('Passord må være minst 6 tegn'); return; }
+    const users = getUsers();
+    users[username].password = newp;
+    saveUsers(users);
+    input.value = '';
+    toast('✓ Passord for ' + username + ' er oppdatert');
   }
 
   function showMember() {

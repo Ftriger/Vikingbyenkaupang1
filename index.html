@@ -779,7 +779,55 @@
       border-color: var(--gold);
     }
 
-    /* ── LOGIN / MODAL ── */
+    /* ── LANGUAGE SWITCHER ── */
+    .lang-bar {
+      background: rgba(10,6,2,0.6);
+      border-bottom: 1px solid rgba(212,168,83,0.15);
+      padding: 5px 24px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 4px;
+      position: relative;
+      z-index: 101;
+    }
+    .lang-label {
+      color: rgba(245,237,216,0.4);
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-right: 6px;
+    }
+    .lang-btn {
+      background: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      padding: 3px 8px;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(245,237,216,0.5);
+      transition: all 0.18s;
+    }
+    .lang-btn:hover {
+      border-color: rgba(212,168,83,0.35);
+      color: var(--gold);
+    }
+    .lang-btn.active {
+      border-color: rgba(212,168,83,0.5);
+      background: rgba(212,168,83,0.1);
+      color: var(--gold);
+    }
+    .lang-flag {
+      font-size: 1rem;
+      line-height: 1;
+    }
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -1412,6 +1460,20 @@
 <body>
 
 <!-- ── NAVIGATION ── -->
+<!-- ── LANGUAGE BAR ── -->
+<div class="lang-bar" id="langBar">
+  <span class="lang-label">Språk / Language</span>
+  <button class="lang-btn active" id="lang-no" onclick="setLang('no')" aria-label="Norsk">
+    <span class="lang-flag">🇳🇴</span> NO
+  </button>
+  <button class="lang-btn" id="lang-en" onclick="setLang('en')" aria-label="English">
+    <span class="lang-flag">🇬🇧</span> EN
+  </button>
+  <button class="lang-btn" id="lang-de" onclick="setLang('de')" aria-label="Deutsch">
+    <span class="lang-flag">🇩🇪</span> DE
+  </button>
+</div>
+
 <nav id="navbar">
   <a href="#" class="nav-logo" aria-label="Kaupang Vikingby">
     <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1423,16 +1485,16 @@
   </a>
 
   <ul class="nav-links" id="navLinks">
-    <li><a href="#om">Om oss</a></li>
-    <li><a href="#aktiviteter">Aktiviteter</a></li>
-    <li><a href="#galleri">Galleri</a></li>
-    <li><a href="#blogg">Blogg</a></li>
-    <li><a href="#butikk">Butikk</a></li>
-    <li><a href="#praktisk">Praktisk</a></li>
-    <li><a href="#vedtekter">Vedtekter</a></li>
+    <li><a href="#om" data-i18n="nav_om">Om oss</a></li>
+    <li><a href="#aktiviteter" data-i18n="nav_akt">Aktiviteter</a></li>
+    <li><a href="#galleri" data-i18n="nav_gal">Galleri</a></li>
+    <li><a href="#blogg" data-i18n="nav_blogg">Blogg</a></li>
+    <li><a href="#butikk" data-i18n="nav_butikk">Butikk</a></li>
+    <li><a href="#praktisk" data-i18n="nav_praktisk">Praktisk</a></li>
+    <li><a href="#vedtekter" data-i18n="nav_vedtekter">Vedtekter</a></li>
     <li><button id="cartNavBtn" onclick="toggleCart()" style="background:none;border:none;cursor:pointer;font-size:1rem;color:var(--parchment);padding:0;" aria-label="Handlekurv">🧺 <span id="cartBadge" class="cart-badge" style="display:none;">0</span></button></li>
-    <li><button class="nav-login" id="loginNavBtn" onclick="openLoginModal()">Logg inn</button></li>
-    <li><a href="#kontakt" class="nav-cta">Kontakt</a></li>
+    <li><button class="nav-login" id="loginNavBtn" onclick="openLoginModal()" data-i18n="nav_login">Logg inn</button></li>
+    <li><a href="#kontakt" class="nav-cta" data-i18n="nav_kontakt">Kontakt</a></li>
   </ul>
 
   <button class="hamburger" id="hamburger" aria-label="Åpne meny" aria-expanded="false">
@@ -1455,16 +1517,15 @@
       <circle cx="30" cy="30" r="4" fill="#D4A853"/>
     </svg>
 
-    <span class="hero-label">Norges første by · Kaupangveien 276, Larvik</span>
-    <h1>Trå inn i historien hos Kaupang Vikingby</h1>
+    <span class="hero-label" data-i18n="hero_label">Norges første by · Kaupangveien 276, Larvik</span>
+    <h1 data-i18n="hero_h1">Trå inn i historien hos Kaupang Vikingby</h1>
     <p class="hero-sub">
-      Opplev ekte vikingtid gjennom levende historie, tradisjonelt håndverk<br>
-      og fellesskap på historisk grunn ved Viksfjorden.
+      <span data-i18n="hero_sub">Opplev ekte vikingtid gjennom levende historie, tradisjonelt håndverk og fellesskap på historisk grunn ved Viksfjorden.</span>
     </p>
 
     <div class="hero-btns">
-      <a href="#praktisk" class="btn-primary">Planlegg ditt besøk</a>
-      <a href="#aktiviteter" class="btn-outline">Se aktiviteter</a>
+      <a href="#praktisk" class="btn-primary" data-i18n="hero_btn1">Planlegg ditt besøk</a>
+      <a href="#aktiviteter" class="btn-outline" data-i18n="hero_btn2">Se aktiviteter</a>
     </div>
   </div>
 
@@ -1895,8 +1956,8 @@
 <!-- ── CONTACT ── -->
 <section id="kontakt">
   <div class="container">
-    <span class="section-label" data-reveal>Finn oss</span>
-    <h2 class="section-title" data-reveal data-reveal-delay="1">Kom og besøk oss</h2>
+    <span class="section-label" data-reveal data-i18n="kontakt_label">Finn oss</span>
+    <h2 class="section-title" data-reveal data-reveal-delay="1" data-i18n="kontakt_title">Kom og besøk oss</h2>
     <div class="divider divider-center" data-reveal data-reveal-delay="2"></div>
 
     <div class="contact-grid" data-reveal data-reveal-delay="2">
@@ -1905,14 +1966,14 @@
           <path d="M4 6h20v16H4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
           <path d="M4 6l10 10L24 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
-        <h4>E-post</h4>
+        <h4 data-i18n="info_epost">E-post</h4>
         <a href="mailto:post@kaupangprosjektet.no">post@kaupangprosjektet.no</a>
       </div>
       <div class="contact-item">
         <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M6 4h5l2 5-2.5 2.5C11.5 14 14 16.5 17 18l2.5-2.5L24 18v5c0 1-1 2-2 2C8 24 4 10 4 6c0-1 1-2 2-2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
         </svg>
-        <h4>Telefon</h4>
+        <h4 data-i18n="info_tlf">Telefon</h4>
         <a href="tel:+4790622744">+47 906 22 744</a>
       </div>
       <div class="contact-item">
@@ -1920,7 +1981,7 @@
           <path d="M14 3C8.477 3 4 7.477 4 13c0 8 10 14 10 14s10-6 10-14c0-5.523-4.477-10-10-10z" stroke="currentColor" stroke-width="1.5"/>
           <circle cx="14" cy="13" r="3" stroke="currentColor" stroke-width="1.5"/>
         </svg>
-        <h4>Adresse</h4>
+        <h4 data-i18n="info_adresse">Adresse</h4>
         <p>Kaupangveien 276<br>3261 Larvik</p>
       </div>
       <div class="contact-item">
@@ -1928,19 +1989,19 @@
           <circle cx="14" cy="14" r="10" stroke="currentColor" stroke-width="1.5"/>
           <path d="M14 6v8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
         </svg>
-        <h4>Sesong</h4>
-        <p>24. juni – 30. august<br>Tirsd.–sønd. 10–17</p>
+        <h4 data-i18n="info_sesong">Sesong</h4>
+        <p data-i18n="info_sesong_val">24. juni – 30. august<br>Tirsd.–sønd. 10–17</p>
       </div>
     </div>
 
     <div class="social-row" data-reveal data-reveal-delay="3">
       <a href="https://www.facebook.com/profile.php?id=6156069640471810" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Besøk oss på Facebook">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-        Følg oss på Facebook
+        <span data-i18n="social_fb">Følg oss på Facebook</span>
       </a>
       <a href="mailto:post@kaupangprosjektet.no" class="social-btn" aria-label="Send oss en e-post">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        Send oss en melding
+        <span data-i18n="social_email">Send oss en melding</span>
       </a>
     </div>
   </div>
@@ -2139,10 +2200,10 @@
 <section id="butikk">
   <div class="container">
     <div style="text-align:center; margin-bottom:3rem;">
-      <span class="section-label" data-reveal>Nettbutikk</span>
-      <h2 class="section-title" data-reveal data-reveal-delay="1">Vikingbutikken</h2>
+      <span class="section-label" data-reveal data-i18n="shop_label">Nettbutikk</span>
+      <h2 class="section-title" data-reveal data-reveal-delay="1" data-i18n="shop_title">Vikingbutikken</h2>
       <div class="divider divider-center" data-reveal data-reveal-delay="2"></div>
-      <p style="color:var(--smoke); font-style:italic; margin-top:1rem;" data-reveal data-reveal-delay="2">Autentiske produkter og opplevelser fra Kaupang</p>
+      <p style="color:var(--smoke); font-style:italic; margin-top:1rem;" data-reveal data-reveal-delay="2" data-i18n="shop_sub">Autentiske produkter og opplevelser fra Kaupang</p>
     </div>
     <div class="shop-grid" id="shopGrid"></div>
     <div id="adminAddProdBtn" style="display:none; text-align:right; margin-top:1.5rem;">
@@ -2243,13 +2304,13 @@
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
 <div class="cart-panel" id="cartPanel">
   <div class="cart-head">
-    <span class="cart-head-title">🧺 Handlekurv</span>
+    <span class="cart-head-title" data-i18n="cart_title">🧺 Handlekurv</span>
     <button class="cart-close-btn" onclick="toggleCart()">✕</button>
   </div>
   <div id="cartItems"><p style="color:var(--smoke);font-style:italic;">Handlekurven er tom</p></div>
   <div id="cartTotalRow" style="display:none;">
     <div class="cart-total-row">Totalt: <strong id="cartTotalVal"></strong></div>
-    <button class="cart-checkout" onclick="checkout()">Gå til kassen</button>
+    <button class="cart-checkout" onclick="checkout()" data-i18n-html="cart_checkout">Gå til kassen</button>
   </div>
 </div>
 
@@ -2269,7 +2330,241 @@
 </footer>
 
 <script>
-  // ── NAV ──────────────────────────────────────────────────────
+  // ── I18N TRANSLATIONS ────────────────────────────────────────
+  const TRANSLATIONS = {
+    no: {
+      // Nav
+      nav_om: 'Om oss', nav_akt: 'Aktiviteter', nav_gal: 'Galleri',
+      nav_blogg: 'Blogg', nav_butikk: 'Butikk', nav_praktisk: 'Praktisk',
+      nav_vedtekter: 'Vedtekter', nav_kontakt: 'Kontakt', nav_login: 'Logg inn',
+      nav_logout_prefix: 'Logg ut',
+      nav_minside: 'Min side', nav_admin: 'Admin',
+      // Hero
+      hero_label: 'Norges første by · Kaupangveien 276, Larvik',
+      hero_h1: 'Trå inn i historien hos Kaupang Vikingby',
+      hero_sub: 'Opplev ekte vikingtid gjennom levende historie, tradisjonelt håndverk og fellesskap på historisk grunn ved Viksfjorden.',
+      hero_btn1: 'Planlegg ditt besøk',
+      hero_btn2: 'Se aktiviteter',
+      // Info
+      info_epost: 'E-post', info_tlf: 'Telefon', info_adresse: 'Adresse', info_sesong: 'Sesong',
+      info_sesong_val: '24. juni – 30. august<br>Tirsd.–sønd. 10–17',
+      // Kontakt
+      kontakt_label: 'Finn oss', kontakt_title: 'Kom og besøk oss',
+      social_fb: 'Følg oss på Facebook', social_email: 'Send oss en melding',
+      // Login modal
+      login_title: 'Innlogging', login_sub: 'Kaupang Vikingby',
+      login_user: 'Brukernavn', login_pass: 'Passord',
+      login_btn: 'Logg inn', login_cancel: 'Avbryt',
+      login_hint: 'ftriger · kaupang · eller · medlem',
+      login_err: 'Feil brukernavn eller passord',
+      // Shop
+      shop_label: 'Nettbutikk', shop_title: 'Vikingbutikken',
+      shop_sub: 'Autentiske produkter og opplevelser fra Kaupang',
+      shop_atc: 'Legg i kurv', shop_stock: 'På lager',
+      // Cart
+      cart_title: 'Handlekurv', cart_empty: 'Handlekurven er tom',
+      cart_total: 'Totalt', cart_checkout: 'Gå til kassen',
+      // Member
+      member_reg_title: 'Bli medlem i Kaupangprosjektet!',
+      member_reg_sub: 'Registrer deg og støtt bevaring av Norges første by.',
+      member_enkelt: 'Enkeltperson', member_familie: 'Familie',
+      member_per_year: 'per år',
+      member_fornavn: 'Fornavn', member_etternavn: 'Etternavn',
+      member_adresse: 'Postadresse', member_postnr: 'Postnr.',
+      member_poststed: 'Poststed', member_epost: 'E-postadresse',
+      member_mobil: 'Mobiltelefon', member_melding: 'Beskjed til Kaupangprosjektet',
+      member_melding_ph: 'Valgfritt…',
+      member_required: 'Navn, adresse, e-post og telefon er påkrevd',
+      member_epost_err: 'Gyldig e-postadresse er påkrevd',
+      member_submit: 'Meld meg inn',
+      member_vedtekter: 'Du vil motta faktura på e-post. Vedtektene finner du',
+      member_vedtekter_link: 'her',
+      member_ok: 'Registrering mottatt! Du vil få faktura tilsendt på e-post.',
+      member_confirmed_title: '✓ Registrert medlem',
+      member_type_enkelt: 'Enkeltmedlem',
+      member_type_familie: 'Familiemedlem',
+      member_since: 'siden',
+      member_paid: '✓ Medlemsavgift bekreftet betalt',
+      member_unpaid: 'Faktura sendes på e-post. Ta kontakt med leder@vikingbyen.org ved spørsmål.',
+      member_type_select: 'Velg type medlemskap *',
+      // Practical
+      prak_adult: 'Voksen', prak_child: 'Barn til sverdhøyde', prak_free: 'Gratis',
+      prak_group: 'Grupper', prak_group_val: 'Avtal pris',
+      // Toast
+      toast_added: 'lagt i kurv',
+      toast_checkout: 'Bestillingsepost åpnet – send den for å fullføre!',
+      toast_reg: 'Registrering sendt! Faktura kommer på e-post.',
+      toast_welcome: 'Velkommen,',
+      toast_logout: 'Du er logget ut',
+      // Schedule
+      sched_times: 'Kl. 11:00 · 13:00 · 15:00',
+      sched_note: '30. juni – 16. august · 30–60 minutter',
+    },
+
+    en: {
+      nav_om: 'About', nav_akt: 'Activities', nav_gal: 'Gallery',
+      nav_blogg: 'Blog', nav_butikk: 'Shop', nav_praktisk: 'Visit',
+      nav_vedtekter: 'Statutes', nav_kontakt: 'Contact', nav_login: 'Log in',
+      nav_logout_prefix: 'Log out',
+      nav_minside: 'My page', nav_admin: 'Admin',
+      hero_label: 'Norway\'s first town · Kaupangveien 276, Larvik',
+      hero_h1: 'Step into history at Kaupang Viking Town',
+      hero_sub: 'Experience authentic Viking Age life through living history, traditional crafts and community on historic ground by the Viksfjord.',
+      hero_btn1: 'Plan your visit',
+      hero_btn2: 'See activities',
+      info_epost: 'Email', info_tlf: 'Phone', info_adresse: 'Address', info_sesong: 'Season',
+      info_sesong_val: '24 June – 30 August<br>Tue–Sun 10:00–17:00',
+      kontakt_label: 'Find us', kontakt_title: 'Come and visit us',
+      social_fb: 'Follow us on Facebook', social_email: 'Send us a message',
+      login_title: 'Log in', login_sub: 'Kaupang Viking Town',
+      login_user: 'Username', login_pass: 'Password',
+      login_btn: 'Log in', login_cancel: 'Cancel',
+      login_hint: 'ftriger · kaupang · or · member',
+      login_err: 'Incorrect username or password',
+      shop_label: 'Online shop', shop_title: 'The Viking Shop',
+      shop_sub: 'Authentic products and experiences from Kaupang',
+      shop_atc: 'Add to cart', shop_stock: 'In stock',
+      cart_title: 'Shopping cart', cart_empty: 'Your cart is empty',
+      cart_total: 'Total', cart_checkout: 'Proceed to checkout',
+      member_reg_title: 'Become a member of Kaupangprosjektet!',
+      member_reg_sub: 'Register and support the preservation of Norway\'s first town.',
+      member_enkelt: 'Individual', member_familie: 'Family',
+      member_per_year: 'per year',
+      member_fornavn: 'First name', member_etternavn: 'Last name',
+      member_adresse: 'Postal address', member_postnr: 'Post code',
+      member_poststed: 'City', member_epost: 'Email address',
+      member_mobil: 'Mobile phone', member_melding: 'Message to Kaupangprosjektet',
+      member_melding_ph: 'Optional…',
+      member_required: 'Name, address, email and phone are required',
+      member_epost_err: 'A valid email address is required',
+      member_submit: 'Join now',
+      member_vedtekter: 'You will receive an invoice by email. Read the statutes',
+      member_vedtekter_link: 'here',
+      member_ok: 'Registration received! You will receive an invoice by email.',
+      member_confirmed_title: '✓ Registered member',
+      member_type_enkelt: 'Individual member',
+      member_type_familie: 'Family member',
+      member_since: 'since',
+      member_paid: '✓ Membership fee confirmed paid',
+      member_unpaid: 'Invoice will be sent by email. Contact leder@vikingbyen.org with questions.',
+      member_type_select: 'Select membership type *',
+      prak_adult: 'Adult', prak_child: 'Children (sword height)', prak_free: 'Free',
+      prak_group: 'Groups', prak_group_val: 'Contact for pricing',
+      toast_added: 'added to cart',
+      toast_checkout: 'Order email opened – please send it to complete your order!',
+      toast_reg: 'Registration sent! Invoice will arrive by email.',
+      toast_welcome: 'Welcome,',
+      toast_logout: 'You have been logged out',
+      sched_times: '11:00 · 13:00 · 15:00',
+      sched_note: '30 June – 16 August · 30–60 minutes',
+    },
+
+    de: {
+      nav_om: 'Über uns', nav_akt: 'Aktivitäten', nav_gal: 'Galerie',
+      nav_blogg: 'Blog', nav_butikk: 'Shop', nav_praktisk: 'Besuch',
+      nav_vedtekter: 'Satzung', nav_kontakt: 'Kontakt', nav_login: 'Anmelden',
+      nav_logout_prefix: 'Abmelden',
+      nav_minside: 'Meine Seite', nav_admin: 'Admin',
+      hero_label: 'Norwegens erste Stadt · Kaupangveien 276, Larvik',
+      hero_h1: 'Tritt ein in die Geschichte – Kaupang Wikingerstadt',
+      hero_sub: 'Erlebe authentisches Wikingerleben durch lebendige Geschichte, traditionelles Handwerk und Gemeinschaft auf historischem Boden am Viksfjord.',
+      hero_btn1: 'Besuch planen',
+      hero_btn2: 'Aktivitäten ansehen',
+      info_epost: 'E-Mail', info_tlf: 'Telefon', info_adresse: 'Adresse', info_sesong: 'Saison',
+      info_sesong_val: '24. Juni – 30. August<br>Di–So 10:00–17:00',
+      kontakt_label: 'Finden Sie uns', kontakt_title: 'Kommen Sie uns besuchen',
+      social_fb: 'Folgen Sie uns auf Facebook', social_email: 'Schreiben Sie uns',
+      login_title: 'Anmelden', login_sub: 'Kaupang Wikingerstadt',
+      login_user: 'Benutzername', login_pass: 'Passwort',
+      login_btn: 'Anmelden', login_cancel: 'Abbrechen',
+      login_hint: 'ftriger · kaupang · oder · mitglied',
+      login_err: 'Falscher Benutzername oder Passwort',
+      shop_label: 'Onlineshop', shop_title: 'Der Wikingershop',
+      shop_sub: 'Authentische Produkte und Erlebnisse aus Kaupang',
+      shop_atc: 'In den Warenkorb', shop_stock: 'Auf Lager',
+      cart_title: 'Warenkorb', cart_empty: 'Ihr Warenkorb ist leer',
+      cart_total: 'Gesamt', cart_checkout: 'Zur Kasse',
+      member_reg_title: 'Werden Sie Mitglied bei Kaupangprosjektet!',
+      member_reg_sub: 'Registrieren Sie sich und unterstützen Sie Norwegens erste Stadt.',
+      member_enkelt: 'Einzelperson', member_familie: 'Familie',
+      member_per_year: 'pro Jahr',
+      member_fornavn: 'Vorname', member_etternavn: 'Nachname',
+      member_adresse: 'Postanschrift', member_postnr: 'Postleitzahl',
+      member_poststed: 'Ort', member_epost: 'E-Mail-Adresse',
+      member_mobil: 'Mobiltelefon', member_melding: 'Nachricht an Kaupangprosjektet',
+      member_melding_ph: 'Optional…',
+      member_required: 'Name, Adresse, E-Mail und Telefon sind erforderlich',
+      member_epost_err: 'Eine gültige E-Mail-Adresse ist erforderlich',
+      member_submit: 'Jetzt beitreten',
+      member_vedtekter: 'Sie erhalten eine Rechnung per E-Mail. Lesen Sie die Satzung',
+      member_vedtekter_link: 'hier',
+      member_ok: 'Registrierung erhalten! Sie erhalten eine Rechnung per E-Mail.',
+      member_confirmed_title: '✓ Registriertes Mitglied',
+      member_type_enkelt: 'Einzelmitglied',
+      member_type_familie: 'Familienmitglied',
+      member_since: 'seit',
+      member_paid: '✓ Mitgliedsbeitrag bestätigt bezahlt',
+      member_unpaid: 'Rechnung wird per E-Mail gesendet. Kontaktieren Sie leder@vikingbyen.org bei Fragen.',
+      member_type_select: 'Mitgliedschaftsart wählen *',
+      prak_adult: 'Erwachsener', prak_child: 'Kinder (Schwerthöhe)', prak_free: 'Kostenlos',
+      prak_group: 'Gruppen', prak_group_val: 'Preis auf Anfrage',
+      toast_added: 'zum Warenkorb hinzugefügt',
+      toast_checkout: 'Bestell-E-Mail geöffnet – bitte senden Sie sie ab!',
+      toast_reg: 'Registrierung gesendet! Rechnung kommt per E-Mail.',
+      toast_welcome: 'Willkommen,',
+      toast_logout: 'Sie wurden abgemeldet',
+      sched_times: '11:00 · 13:00 · 15:00',
+      sched_note: '30. Juni – 16. August · 30–60 Minuten',
+    }
+  };
+
+  let currentLang = localStorage.getItem('kv_lang') || 'no';
+
+  function t(key) {
+    return (TRANSLATIONS[currentLang] && TRANSLATIONS[currentLang][key]) ||
+           (TRANSLATIONS['no'][key]) || key;
+  }
+
+  function setLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('kv_lang', lang);
+    // Update flag buttons
+    ['no','en','de'].forEach(l => {
+      const btn = document.getElementById('lang-' + l);
+      if (btn) btn.classList.toggle('active', l === lang);
+    });
+    // Update all data-i18n elements
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      const val = t(key);
+      if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+        el.placeholder = val;
+      } else {
+        el.innerHTML = val;
+      }
+    });
+    // Update html lang attribute
+    document.documentElement.lang = lang === 'no' ? 'nb' : lang;
+    // Re-render dynamic sections if visible
+    if (document.getElementById('cartItems')) renderCart();
+    if (document.getElementById('shopGrid') && document.getElementById('shopGrid').children.length) renderShop();
+    // Update login modal if open
+    updateLoginModalLang();
+    // Update auth button
+    updateAuthUI();
+  }
+
+  function updateLoginModalLang() {
+    const el = (id) => document.getElementById(id);
+    if (el('loginModal')) {
+      const h2 = el('loginModal').querySelector('h2');
+      if (h2) { h2.childNodes[0].textContent = t('login_title'); }
+      const sub = el('loginModal').querySelector('.modal-sub');
+      if (sub) sub.textContent = t('login_sub');
+      const hint = el('loginModal').querySelector('.demo-hint');
+      if (hint) hint.textContent = t('login_hint');
+    }
+  }
   const hamburger = document.getElementById('hamburger');
   const navLinks = document.getElementById('navLinks');
   hamburger.addEventListener('click', () => {
@@ -2352,11 +2647,11 @@
       document.getElementById('loginPass').value = '';
       err.style.display = 'none';
       updateAuthUI();
-      toast('Velkommen, ' + currentUser.name + '!');
+      toast(t('toast_welcome') + ' ' + currentUser.name + '!');
       if (currentUser.role === 'superadmin' || currentUser.role === 'admin') { showAdmin(); }
       else { showMember(); }
     } else {
-      err.textContent = 'Feil brukernavn eller passord';
+      err.textContent = t('login_err');
       err.style.display = 'block';
     }
   }
@@ -2429,19 +2724,22 @@
     document.getElementById('member-section').classList.remove('visible');
     document.getElementById('adminAddProdBtn').style.display = 'none';
     renderShop();
-    toast('Du er logget ut');
+    toast(t('toast_logout'));
   }
 
   function updateAuthUI() {
     const btn = document.getElementById('loginNavBtn');
+    if (!btn) return;
     if (currentUser) {
-      btn.textContent = 'Logg ut (' + currentUser.name.split(' ')[0] + ')';
+      btn.textContent = t('nav_logout_prefix') + ' (' + currentUser.name.split(' ')[0] + ')';
       btn.classList.add('logout');
       btn.onclick = doLogout;
+      btn.removeAttribute('data-i18n');
     } else {
-      btn.textContent = 'Logg inn';
+      btn.textContent = t('nav_login');
       btn.classList.remove('logout');
       btn.onclick = openLoginModal;
+      btn.setAttribute('data-i18n', 'nav_login');
     }
   }
 
@@ -2464,8 +2762,8 @@
         <div class="prod-name">${p.name}</div>
         <div class="prod-desc">${p.description}</div>
         <div class="prod-price">${p.price} kr</div>
-        <div class="prod-stock">På lager: ${p.stock} stk</div>
-        <button class="atc-btn" onclick="addToCart(${p.id})">Legg i kurv</button>
+        <div class="prod-stock">${t('shop_stock')}: ${p.stock} stk</div>
+        <button class="atc-btn" onclick="addToCart(${p.id})">${t('shop_atc')}</button>
         ${isAdmin ? `<div style="display:flex;gap:4px;margin-top:8px;"><button class="tbl-btn edit" style="flex:1" onclick="openEditProductModal(${p.id})">Rediger</button><button class="tbl-btn del" style="flex:1" onclick="deleteProduct(${p.id})">Slett</button></div>` : ''}
       </div>
     `).join('');
@@ -2482,7 +2780,7 @@
     if (ex) ex.qty++;
     else cart.push({ ...p, qty: 1 });
     renderCart();
-    toast(p.name + ' lagt i kurv');
+    toast(p.name + ' ' + t('toast_added'));
   }
 
   function removeFromCart(id) {
@@ -2500,7 +2798,7 @@
     const itemsEl = document.getElementById('cartItems');
     const totalRow = document.getElementById('cartTotalRow');
     if (cart.length === 0) {
-      itemsEl.innerHTML = '<p style="color:var(--smoke);font-style:italic;">Handlekurven er tom</p>';
+      itemsEl.innerHTML = '<p style="color:var(--smoke);font-style:italic;">' + t('cart_empty') + '</p>';
       totalRow.style.display = 'none';
     } else {
       itemsEl.innerHTML = cart.map(i => `
@@ -2537,7 +2835,7 @@
     cart = [];
     renderCart();
     toggleCart();
-    toast('Bestillingsepost åpnet – send den for å fullføre!');
+    toast(t('toast_checkout'));
   }
 
   // ── MEDLEMSREGISTER ───────────────────────────────────────────
@@ -2994,28 +3292,28 @@
           <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(255,255,255,.03) 40px,rgba(255,255,255,.03) 41px);"></div>
           <div style="position:relative;">
             <p style="font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.28em;color:rgba(245,237,216,.6);text-transform:uppercase;margin-bottom:8px;">Kaupangprosjektet</p>
-            <h2 style="font-family:'Cinzel',serif;font-size:clamp(1.4rem,3vw,2rem);color:var(--parchment);font-weight:900;line-height:1.15;margin-bottom:12px;">Bli medlem i<br/>Kaupangprosjektet!</h2>
-            <p style="color:rgba(245,237,216,.75);font-style:italic;font-size:1rem;line-height:1.55;">Støtt bevaring og formidling av Norges første by. Som medlem får du nyhetsbrev, invitasjoner og er med på å gjøre historien levende.</p>
+            <h2 style="font-family:'Cinzel',serif;font-size:clamp(1.4rem,3vw,2rem);color:var(--parchment);font-weight:900;line-height:1.15;margin-bottom:12px;">${t('member_reg_title')}</h2>
+            <p style="color:rgba(245,237,216,.75);font-style:italic;font-size:1rem;line-height:1.55;">${t('member_reg_sub')}</p>
           </div>
         </div>
 
         <!-- Membership type cards -->
         <div style="padding:24px 28px 0;">
-          <p style="font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke);margin-bottom:12px;">Velg type medlemskap *</p>
+          <p style="font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke);margin-bottom:12px;">${t('member_type_select')}</p>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;">
             <label id="card-enkelt" onclick="selectMembership('enkelt')" style="cursor:pointer;border:2px solid var(--ember);background:var(--ember);border-radius:3px;padding:16px;text-align:center;transition:all .2s;">
               <input type="radio" name="regType" value="enkelt" id="typeEnkelt" style="display:none;" checked />
               <div style="font-size:1.5rem;margin-bottom:6px;">👤</div>
-              <div style="font-family:'Cinzel',serif;color:var(--parchment);font-size:.85rem;font-weight:600;">Enkeltperson</div>
+              <div style="font-family:'Cinzel',serif;color:var(--parchment);font-size:.85rem;font-weight:600;">${t('member_enkelt')}</div>
               <div style="font-family:'Cinzel',serif;color:rgba(245,237,216,.8);font-size:1.3rem;font-weight:900;margin-top:4px;">150 kr</div>
-              <div style="color:rgba(245,237,216,.6);font-size:.75rem;margin-top:2px;">per år</div>
+              <div style="color:rgba(245,237,216,.6);font-size:.75rem;margin-top:2px;">${t('member_per_year')}</div>
             </label>
             <label id="card-familie" onclick="selectMembership('familie')" style="cursor:pointer;border:2px solid var(--parchment-deep);background:var(--parchment);border-radius:3px;padding:16px;text-align:center;transition:all .2s;">
               <input type="radio" name="regType" value="familie" id="typeFamilie" style="display:none;" />
               <div style="font-size:1.5rem;margin-bottom:6px;">👨‍👩‍👧</div>
-              <div style="font-family:'Cinzel',serif;color:var(--ore);font-size:.85rem;font-weight:600;">Familie</div>
+              <div style="font-family:'Cinzel',serif;color:var(--ore);font-size:.85rem;font-weight:600;">${t('member_familie')}</div>
               <div style="font-family:'Cinzel',serif;color:var(--ember);font-size:1.3rem;font-weight:900;margin-top:4px;">200 kr</div>
-              <div style="color:var(--ash);font-size:.75rem;margin-top:2px;">per år</div>
+              <div style="color:var(--ash);font-size:.75rem;margin-top:2px;">${t('member_per_year')}</div>
             </label>
           </div>
 
@@ -3030,16 +3328,16 @@
             <div class="form-field" style="margin-bottom:0;"><label>Poststed *</label><input id="regPoststed" placeholder="Oslo" /></div>
           </div>
           <div class="form-field" style="margin-top:12px;"><label>E-postadresse *</label><input id="regEpost" type="email" placeholder="ola@eksempel.no" /></div>
-          <div class="form-field"><label>Mobiltelefon *</label><input id="regTelefon" type="tel" placeholder="+47 000 00 000" /></div>
-          <div class="form-field"><label>Beskjed til Kaupangprosjektet</label><textarea id="regMelding" rows="2" placeholder="Valgfritt…"></textarea></div>
+          <div class="form-field"><label>${t('member_mobil')}</label><input id="regTelefon" type="tel" placeholder="+47 000 00 000" /></div>
+          <div class="form-field"><label>${t('member_melding')}</label><textarea id="regMelding" rows="2" placeholder="Valgfritt…"></textarea></div>
 
           <div id="regErr" class="form-err" style="display:none;margin-bottom:10px;"></div>
-          <div id="regOk" style="display:none;background:rgba(42,122,42,.1);border:1px solid #2a7a2a;color:#2a7a2a;padding:12px 16px;font-style:italic;margin-bottom:12px;border-radius:2px;">✓ Registrering mottatt! Du vil få faktura tilsendt på e-post.</div>
+          <div id="regOk" style="display:none;background:rgba(42,122,42,.1);border:1px solid #2a7a2a;color:#2a7a2a;padding:12px 16px;font-style:italic;margin-bottom:12px;border-radius:2px;">${t('member_ok')}</div>
         </div>
 
         <!-- Submit -->
         <div style="padding:0 28px 28px;">
-          <button class="modal-submit" style="margin-top:12px;border-radius:3px;font-size:.85rem;padding:13px;" onclick="submitRegistration()">Meld meg inn</button>
+          <button class="modal-submit" style="margin-top:12px;border-radius:3px;font-size:.85rem;padding:13px;" onclick="submitRegistration()">${t('member_submit')}</button>
           <p style="color:var(--ash);font-size:.75rem;text-align:center;margin-top:10px;font-style:italic;">Du vil motta faktura på e-post. Vedtektene finner du <a href="https://kaupangprosjektet.no/omkp/vedtekter2012.php" target="_blank" style="color:var(--ember);">her</a>.</p>
         </div>
       </div>` : `
@@ -3047,11 +3345,11 @@
         <div style="position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 40px,rgba(255,255,255,.02) 40px,rgba(255,255,255,.02) 41px);"></div>
         <div style="position:relative;">
           <p style="font-family:'Cinzel',serif;font-size:.7rem;letter-spacing:.28em;color:rgba(200,240,200,.5);text-transform:uppercase;margin-bottom:8px;">Status</p>
-          <h3 style="font-family:'Cinzel',serif;color:#c8f0c8;font-size:1.3rem;margin-bottom:10px;">✓ Registrert medlem</h3>
-          <p style="color:rgba(200,240,200,.8);">Du er registrert som <strong>${alreadyReg.type === 'familie' ? 'Familiemedlem' : 'Enkeltmedlem'}</strong> siden ${alreadyReg.meldt}.</p>
+          <h3 style="font-family:'Cinzel',serif;color:#c8f0c8;font-size:1.3rem;margin-bottom:10px;">${t('member_confirmed_title')}</h3>
+          <p style="color:rgba(200,240,200,.8);">${t('member_confirmed_title').replace('✓ ','').split(' ')[0]} — <strong>${alreadyReg.type === 'familie' ? t('member_type_familie') : t('member_type_enkelt')}</strong> ${t('member_since')} ${alreadyReg.meldt}.</p>
           ${alreadyReg.status === 'betalt'
-            ? '<div style="margin-top:12px;background:rgba(255,255,255,.1);border:1px solid rgba(200,240,200,.3);padding:10px 14px;border-radius:2px;color:#c8f0c8;font-style:italic;">✓ Medlemsavgift bekreftet betalt</div>'
-            : '<div style="margin-top:12px;background:rgba(255,255,255,.08);border:1px solid rgba(200,240,200,.2);padding:10px 14px;border-radius:2px;color:rgba(200,240,200,.7);font-size:.88rem;font-style:italic;">Faktura sendes på e-post. Ta kontakt med leder@vikingbyen.org ved spørsmål.</div>'}
+            ? `<div style="margin-top:12px;background:rgba(255,255,255,.1);border:1px solid rgba(200,240,200,.3);padding:10px 14px;border-radius:2px;color:#c8f0c8;font-style:italic;">${t('member_paid')}</div>`
+            : `<div style="margin-top:12px;background:rgba(255,255,255,.08);border:1px solid rgba(200,240,200,.2);padding:10px 14px;border-radius:2px;color:rgba(200,240,200,.7);font-size:.88rem;font-style:italic;">${t('member_unpaid')}</div>`}
         </div>
       </div>`) +
       `<div class="member-card">
@@ -3103,10 +3401,10 @@
     const ok  = document.getElementById('regOk');
     err.style.display = 'none';
 
-    if (!fornavn || !etternavn) { err.textContent = 'Fornavn og etternavn er påkrevd'; err.style.display = 'block'; return; }
-    if (!adresse || !postnr || !poststed) { err.textContent = 'Postadresse er påkrevd'; err.style.display = 'block'; return; }
-    if (!epost || !/^[^@]+@[^@]+\.[^@]+$/.test(epost)) { err.textContent = 'Gyldig e-postadresse er påkrevd'; err.style.display = 'block'; return; }
-    if (!telefon) { err.textContent = 'Mobiltelefon er påkrevd'; err.style.display = 'block'; return; }
+    if (!fornavn || !etternavn) { err.textContent = t('member_required'); err.style.display = 'block'; return; }
+    if (!adresse || !postnr || !poststed) { err.textContent = t('member_required'); err.style.display = 'block'; return; }
+    if (!epost || !/^[^@]+@[^@]+\.[^@]+$/.test(epost)) { err.textContent = t('member_epost_err'); err.style.display = 'block'; return; }
+    if (!telefon) { err.textContent = t('member_required'); err.style.display = 'block'; return; }
 
     const result = registerMember({ navn, fornavn, etternavn, adresse, postnr, poststed, epost, telefon, melding, type });
     if (!result.ok) { err.textContent = result.msg; err.style.display = 'block'; return; }
@@ -3130,7 +3428,7 @@
       window.open('mailto:leder@vikingbyen.org?subject=' + subject + '&body=' + body, '_blank');
       showMember();
     }, 900);
-    toast('Registrering sendt! Faktura kommer på e-post.');
+    toast(t('toast_reg'));
   }
 
   // ── GALLERY LIGHTBOX ─────────────────────────────────────────
@@ -3193,6 +3491,7 @@
   });
 
   // ── INIT ─────────────────────────────────────────────────────
+  setLang(currentLang);
   renderShop();
   renderCart();
 </script>

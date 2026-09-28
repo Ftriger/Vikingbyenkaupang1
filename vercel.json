@@ -1,9 +1,11 @@
 {
-  "version": 2,
-  "builds": [
+  "headers": [
     {
-      "src": "**/*",
-      "use": "@vercel/static"
+      "source": "/medlemmer.html",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
     }
   ]
 }

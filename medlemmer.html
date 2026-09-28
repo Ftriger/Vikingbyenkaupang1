@@ -323,6 +323,7 @@ async function save(parts) {
 function showLogin() { $('app').classList.add('hidden'); $('logoutBtn').classList.add('hidden'); $('login').classList.remove('hidden'); setTimeout(() => $('pw').focus(), 50); }
 async function login() {
   $('loginErr').classList.add('hidden');
+  $('loginErr').textContent = '';
   try { await api('/api/login', { method: 'POST', body: JSON.stringify({ password: $('pw').value }) }); $('pw').value = ''; await load(); }
   catch (e) { $('loginErr').textContent = e.message; $('loginErr').classList.remove('hidden'); }
 }
@@ -330,7 +331,11 @@ async function logout() { await fetch('/api/login', { method: 'DELETE' }); showL
 
 async function load() {
   let d;
-  try { d = await api('/api/data'); } catch { return; }
+  try { d = await api('/api/data'); }
+  catch (e) {
+    if (e.message !== 'Ikke innlogget') { $('loginErr').textContent = 'Innlogget, men klarte ikke å hente data: ' + e.message; $('loginErr').classList.remove('hidden'); }
+    return;
+  }
   S = { members: [], invoices: [], categories: [], settings: {}, log: [], ...d };
   $('login').classList.add('hidden'); $('app').classList.remove('hidden'); $('logoutBtn').classList.remove('hidden');
   renderSetup(); renderAll();

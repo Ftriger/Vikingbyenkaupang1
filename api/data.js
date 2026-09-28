@@ -12,6 +12,17 @@ const DEFAULT_SETTINGS = {
 };
 
 module.exports = async (req, res) => {
+  try { return await handle(req, res); }
+  catch (e) {
+    const msg = String(e.message || e);
+    let hint = '';
+    if (/unauthori|WRONGPASS|invalid/i.test(msg)) hint = ' – sjekk at UPSTASH_REDIS_REST_TOKEN er kopiert riktig (hele tokenet, uten mellomrom).';
+    else if (/fetch failed|ENOTFOUND|Invalid URL|URL/i.test(msg)) hint = ' – sjekk at UPSTASH_REDIS_REST_URL er https-adressen fra «REST API» i Upstash.';
+    send(res, 500, { error: 'Databasefeil: ' + msg + hint });
+  }
+};
+
+async function handle(req, res) {
   if (!isAuthed(req)) return send(res, 401, { error: 'Ikke innlogget' });
   if (!dbConfig()) return send(res, 200, { setup: { db: false, mail: mailConfigured() } });
 
@@ -34,4 +45,4 @@ module.exports = async (req, res) => {
     return send(res, 200, { ok: true });
   }
   send(res, 405, { error: 'Metode ikke tillatt' });
-};
+}

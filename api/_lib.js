@@ -4,8 +4,10 @@ const crypto = require('crypto');
 
 // ── Database (Upstash Redis via REST – kobles til i Vercel → Storage) ──
 function dbConfig() {
-  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  const clean = v => (v || '').trim().replace(/^["']|["']$/g, '').trim();
+  let url = clean(process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL);
+  const token = clean(process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN);
+  if (url && !/^https?:\/\//.test(url)) url = 'https://' + url.replace(/^rediss?:\/\/[^@]*@/, '').replace(/:\d+$/, '');
   return url && token ? { url: url.replace(/\/$/, ''), token } : null;
 }
 
@@ -17,7 +19,8 @@ async function redis(cmd) {
     headers: { Authorization: 'Bearer ' + cfg.token, 'Content-Type': 'application/json' },
     body: JSON.stringify(cmd),
   });
-  const j = await r.json();
+  const txt = await r.text();
+  let j; try { j = JSON.parse(txt); } catch { throw new Error('HTTP ' + r.status + ' ' + txt.slice(0, 120)); }
   if (j.error) throw new Error(j.error);
   return j.result;
 }

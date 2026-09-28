@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Medlemsregister – Kaupangprosjektet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ore: #2C1A0E; --ore-mid: #5C3A1E; --forge: #8B4513; --forge-lt: #A85A22;
+    --parchment: #F5EDD8; --parchment-deep: #EDE0C4; --paper: #FBF6EA; --smoke: #6B5F55;
+    --line: #E2D3B3; --ok: #2F6B3A; --ok-bg: #E3F0DF; --warn: #9A5B00; --warn-bg: #FBEBCB;
+    --bad: #9B2C1F; --bad-bg: #F6DDD7; --radius: 8px;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', system-ui, sans-serif; font-size: 15px; color: var(--ore); background: var(--parchment); }
+  h1, h2, h3 { font-family: 'Cinzel', serif; margin: 0; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  a { color: var(--forge); }
+
+  header { background: var(--ore); color: var(--parchment); padding: 14px 20px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 1.15rem; letter-spacing: .06em; }
+  header .sp { flex: 1; }
+  header a, header button { color: var(--parchment); background: none; border: 1px solid rgba(245,237,216,.35); border-radius: var(--radius); padding: 6px 12px; cursor: pointer; text-decoration: none; font-size: .85rem; }
+  header a:hover, header button:hover { background: rgba(245,237,216,.12); }
+
+  nav.tabs { background: var(--ore-mid); display: flex; overflow-x: auto; padding: 0 12px; }
+  nav.tabs button { background: none; border: 0; color: var(--parchment-deep); padding: 12px 16px; cursor: pointer; white-space: nowrap; border-bottom: 3px solid transparent; font-weight: 500; }
+  nav.tabs button.active { color: #fff; border-bottom-color: #E0A96D; }
+
+  main { max-width: 1200px; margin: 0 auto; padding: 20px 16px 60px; }
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-bottom: 18px; }
+  .card h2 { font-size: 1.05rem; margin-bottom: 12px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .grow { flex: 1; min-width: 180px; }
+  .muted { color: var(--smoke); font-size: .88rem; }
+
+  .btn { background: var(--forge); color: #fff; border: 0; border-radius: var(--radius); padding: 9px 16px; cursor: pointer; font-weight: 500; }
+  .btn:hover { background: var(--forge-lt); }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .btn.ghost { background: transparent; color: var(--forge); border: 1px solid var(--forge); }
+  .btn.ghost:hover { background: var(--parchment-deep); }
+  .btn.small { padding: 5px 10px; font-size: .82rem; }
+  .btn.danger { background: var(--bad); }
+
+  input[type=text], input[type=email], input[type=tel], input[type=number], input[type=date], input[type=password], input[type=search], select, textarea {
+    width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: var(--radius); background: #fff;
+  }
+  textarea { min-height: 140px; resize: vertical; line-height: 1.5; }
+  label.f { display: block; font-size: .82rem; font-weight: 600; margin-bottom: 4px; color: var(--ore-mid); }
+  .fgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 12px; cursor: pointer; font-size: .85rem; user-select: none; }
+  .chip.on { background: var(--ore-mid); color: #fff; border-color: var(--ore-mid); }
+  .chip small { opacity: .7; margin-left: 4px; }
+  .tag { display: inline-block; background: var(--parchment-deep); border-radius: 999px; padding: 2px 9px; font-size: .78rem; margin: 1px 2px; }
+
+  .tw { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th { text-align: left; background: var(--parchment-deep); font-weight: 600; padding: 9px 10px; white-space: nowrap; position: sticky; top: 0; }
+  td { padding: 8px 10px; border-top: 1px solid var(--line); vertical-align: middle; }
+  tr:hover td { background: #FDF9EF; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .status { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: .78rem; font-weight: 600; white-space: nowrap; }
+  .s-ok { background: var(--ok-bg); color: var(--ok); }
+  .s-warn { background: var(--warn-bg); color: var(--warn); }
+  .s-bad { background: var(--bad-bg); color: var(--bad); }
+  .s-none { background: #eee; color: #666; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .stat { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+  .stat b { display: block; font-size: 1.5rem; font-family: 'Cinzel', serif; }
+  .stat span { color: var(--smoke); font-size: .85rem; }
+
+  .paid-toggle { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .paid-toggle input { width: 18px; height: 18px; accent-color: var(--ok); cursor: pointer; }
+
+  .modal-bg { position: fixed; inset: 0; background: rgba(44,26,14,.55); display: none; align-items: flex-start; justify-content: center; padding: 40px 12px; overflow-y: auto; z-index: 50; }
+  .modal-bg.open { display: flex; }
+  .modal { background: var(--paper); border-radius: 14px; width: 100%; max-width: 640px; padding: 22px; }
+  .modal h2 { margin-bottom: 14px; font-size: 1.15rem; }
+  .modal .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+
+  #login { max-width: 380px; margin: 12vh auto; }
+  .notice { border-radius: 10px; padding: 12px 14px; margin-bottom: 14px; font-size: .9rem; }
+  .notice.warn { background: var(--warn-bg); color: #5E3A00; }
+  .notice.bad { background: var(--bad-bg); color: var(--bad); }
+  .notice.ok { background: var(--ok-bg); color: var(--ok); }
+  #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--ore); color: #fff; padding: 11px 18px; border-radius: 10px; display: none; z-index: 99; max-width: 90vw; }
+  .hidden { display: none !important; }
+  code { background: var(--parchment-deep); padding: 1px 5px; border-radius: 4px; font-size: .85em; }
+  @media (max-width: 640px) { .hide-sm { display: none; } main { padding: 14px 10px 60px; } }
+  @media print { header, nav, .noprint { display: none !important; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚔️ Medlemsregister</h1>
+  <span class="muted" style="color:var(--parchment-deep)">Kaupangprosjektet</span>
+  <span class="sp"></span>
+  <a href="/">← Til nettsiden</a>
+  <button id="logoutBtn" class="hidden" onclick="logout()">Logg ut</button>
+</header>
+
+<!-- INNLOGGING -->
+<div id="login" class="card hidden">
+  <h2 style="margin-bottom:6px">Logg inn</h2>
+  <p class="muted" style="margin-top:0">Kun for styret.</p>
+  <label class="f" for="pw">Passord</label>
+  <input id="pw" type="password" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()" />
+  <p id="loginErr" class="notice bad hidden" style="margin-top:10px"></p>
+  <button class="btn" style="width:100%;margin-top:12px" onclick="login()">Logg inn</button>
+</div>
+
+<div id="app" class="hidden">
+  <nav class="tabs">
+    <button data-tab="medlemmer" class="active">👥 Medlemmer</button>
+    <button data-tab="fakturaer">🧾 Fakturaer</button>
+    <button data-tab="utsendelse">✉️ Send info</button>
+    <button data-tab="import">📥 Importer</button>
+    <button data-tab="innstillinger">⚙️ Innstillinger</button>
+  </nav>
+  <main>
+    <div id="setupNotice"></div>
+
+    <!-- MEDLEMMER -->
+    <section id="tab-medlemmer">
+      <div class="stats" id="memberStats"></div>
+      <div class="card">
+        <div class="row" style="margin-bottom:12px">
+          <input type="search" id="mSearch" class="grow" placeholder="Søk navn, e-post, telefon, sted …" oninput="renderMembers()" />
+          <button class="btn" onclick="editMember()">+ Nytt medlem</button>
+          <button class="btn ghost" onclick="exportCsv()">Last ned Excel/CSV</button>
+        </div>
+        <div class="chips" id="mCatFilter" style="margin-bottom:12px"></div>
+        <div class="tw"><table id="mTable"></table></div>
+        <p class="muted" id="mCount"></p>
+      </div>
+    </section>
+
+    <!-- FAKTURAER -->
+    <section id="tab-fakturaer" class="hidden">
+      <div class="stats" id="invStats"></div>
+
+      <div class="card">
+        <h2>Ny fakturering</h2>
+        <div class="fgrid">
+          <div><label class="f">Gjelder</label><input type="text" id="fTekst" /></div>
+          <div><label class="f">År</label><input type="number" id="fAar" /></div>
+          <div><label class="f">Forfallsdato</label><input type="date" id="fForfall" /></div>
+        </div>
+        <p class="f" style="margin:16px 0 6px">Hvem skal faktureres?</p>
+        <div class="chips" id="fCats"></div>
+        <p class="f" style="margin:16px 0 6px">Beløp per kategori <span class="muted" style="font-weight:400">(har medlemmet flere kategorier, brukes høyeste beløp)</span></p>
+        <div class="fgrid" id="fPriser"></div>
+        <div class="notice warn" id="fPreview" style="margin-top:16px"></div>
+        <div class="row">
+          <button class="btn" id="fSendBtn" onclick="createInvoices(true)">Lag og send fakturaer på e-post</button>
+          <button class="btn ghost" onclick="createInvoices(false)">Lag uten å sende</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row" style="margin-bottom:12px">
+          <h2 class="grow" style="margin:0">Fakturaoversikt</h2>
+          <select id="iYear" style="width:auto" onchange="renderInvoices()"></select>
+          <select id="iStatus" style="width:auto" onchange="renderInvoices()">
+            <option value="alle">Alle</option><option value="ubetalt">Ubetalte</option>
+            <option value="forfalt">Forfalte (ubetalt)</option><option value="betalt">Betalte</option>
+          </select>
+          <input type="search" id="iSearch" placeholder="Søk navn / nr" style="width:180px" oninput="renderInvoices()" />
+        </div>
+        <div class="row" style="margin-bottom:12px">
+          <button class="btn danger" id="purrAllBtn" onclick="remindAll()">Send purring til alle forfalte</button>
+          <span class="muted">Huk av «Betalt» når pengene er kommet inn.</span>
+        </div>
+        <div class="tw"><table id="iTable"></table></div>
+      </div>
+    </section>
+
+    <!-- UTSENDELSE -->
+    <section id="tab-utsendelse" class="hidden">
+      <div class="card">
+        <h2>Send informasjon til medlemmene</h2>
+        <p class="f" style="margin:0 0 6px">Mottakere</p>
+        <div class="chips" id="uCats"></div>
+        <p class="muted" id="uCount"></p>
+        <div style="margin-top:12px"><label class="f">Emne</label><input type="text" id="uSubject" placeholder="F.eks. Innkalling til årsmøte" /></div>
+        <div style="margin-top:12px"><label class="f">Melding</label>
+          <textarea id="uBody" placeholder="Hei {fornavn}!&#10;&#10;…"></textarea>
+          <p class="muted" style="margin:4px 0 0">Skriv <code>{fornavn}</code> eller <code>{navn}</code> for å få med mottakerens navn. Signaturen fra Innstillinger legges til automatisk.</p>
+        </div>
+        <div class="row" style="margin-top:14px">
+          <button class="btn" onclick="sendInfo()">Send e-post</button>
+          <button class="btn ghost" onclick="copyEmails()">Kopier e-postadresser</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Sendt tidligere</h2>
+        <div class="tw"><table id="logTable"></table></div>
+      </div>
+    </section>
+
+    <!-- IMPORT -->
+    <section id="tab-import" class="hidden">
+      <div class="card">
+        <h2>Importer medlemmer fra Excel eller CSV</h2>
+        <p class="muted" style="margin-top:0">Første rad må være overskrifter (f.eks. Fornavn, Etternavn, E-post, Telefon, Adresse, Postnr, Sted, Kategori). Flere kategorier i samme celle skilles med komma. Medlemmer med samme e-post (eller samme navn uten e-post) blir oppdatert, ikke lagt inn to ganger.</p>
+        <div class="row">
+          <input type="file" id="impFile" accept=".xlsx,.xls,.csv,.txt" onchange="readImport(this.files[0])" />
+          <button class="btn ghost small" onclick="downloadTemplate()">Last ned mal</button>
+        </div>
+        <div id="impMap" class="hidden" style="margin-top:16px">
+          <p class="f">Koble kolonnene</p>
+          <div class="fgrid" id="impCols"></div>
+          <div style="margin-top:12px" class="fgrid">
+            <div><label class="f">Legg i tillegg alle importerte i kategori (valgfritt)</label><input type="text" id="impExtraCat" placeholder="F.eks. Enkeltmedlem" /></div>
+          </div>
+          <p class="f" style="margin-top:16px">Forhåndsvisning (første 5 rader)</p>
+          <div class="tw"><table id="impPreview"></table></div>
+          <div class="row" style="margin-top:14px">
+            <button class="btn" onclick="doImport()">Importer <span id="impN"></span> rader</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- INNSTILLINGER -->
+    <section id="tab-innstillinger" class="hidden">
+      <div class="card">
+        <h2>Kategorier</h2>
+        <p class="muted" style="margin-top:0">F.eks. Enkeltmedlem, Familie, Bedrift, Styret, Frivillig. Nye kategorier fra import legges til automatisk.</p>
+        <div class="chips" id="catList" style="margin-bottom:12px"></div>
+        <div class="row"><input type="text" id="newCat" class="grow" placeholder="Ny kategori" onkeydown="if(event.key==='Enter')addCat()" /><button class="btn" onclick="addCat()">Legg til</button></div>
+      </div>
+      <div class="card">
+        <h2>Faktura og e-post</h2>
+        <div class="fgrid">
+          <div><label class="f">Foreningens navn</label><input type="text" id="sOrgName" /></div>
+          <div><label class="f">Kontonummer</label><input type="text" id="sKontonr" placeholder="1234.56.78901" /></div>
+          <div><label class="f">Vipps-nummer (valgfritt)</label><input type="text" id="sVipps" /></div>
+          <div><label class="f">Org.nr. (valgfritt)</label><input type="text" id="sOrgnr" /></div>
+        </div>
+        <div style="margin-top:12px"><label class="f">Tekst i faktura</label><textarea id="sFakturaTekst" style="min-height:80px"></textarea></div>
+        <div style="margin-top:12px"><label class="f">Tekst i purring</label><textarea id="sPurreTekst" style="min-height:80px"></textarea></div>
+        <div style="margin-top:12px"><label class="f">Signatur</label><textarea id="sSignatur" style="min-height:80px"></textarea></div>
+        <p class="muted"><code>{aar}</code> byttes ut med fakturaåret, <code>{fornavn}</code> med navnet.</p>
+        <button class="btn" onclick="saveSettings()">Lagre innstillinger</button>
+      </div>
+      <div class="card">
+        <h2>Oppsett</h2>
+        <div id="setupStatus"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- MEDLEM-MODAL -->
+<div class="modal-bg" id="memberModal">
+  <div class="modal">
+    <h2 id="mmTitle">Medlem</h2>
+    <div class="fgrid">
+      <div><label class="f">Fornavn</label><input type="text" id="mmFornavn" /></div>
+      <div><label class="f">Etternavn</label><input type="text" id="mmEtternavn" /></div>
+      <div><label class="f">E-post</label><input type="email" id="mmEpost" /></div>
+      <div><label class="f">Telefon</label><input type="tel" id="mmTelefon" /></div>
+      <div><label class="f">Adresse</label><input type="text" id="mmAdresse" /></div>
+      <div><label class="f">Postnr.</label><input type="text" id="mmPostnr" /></div>
+      <div><label class="f">Sted</label><input type="text" id="mmSted" /></div>
+      <div><label class="f">Medlemsnr.</label><input type="text" id="mmNr" /></div>
+      <div><label class="f">Innmeldt</label><input type="date" id="mmInnmeldt" /></div>
+    </div>
+    <p class="f" style="margin:14px 0 6px">Kategorier</p>
+    <div class="chips" id="mmCats"></div>
+    <div style="margin-top:12px"><label class="f">Notat</label><textarea id="mmNotat" style="min-height:60px"></textarea></div>
+    <div id="mmInvoices" style="margin-top:12px"></div>
+    <div class="actions">
+      <button class="btn danger" id="mmDelete" onclick="deleteMember()">Slett</button>
+      <span style="flex:1"></span>
+      <button class="btn ghost" onclick="closeModal()">Avbryt</button>
+      <button class="btn" onclick="saveMember()">Lagre</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<script>
+/* ───────── Tilstand ───────── */
+let S = { members: [], invoices: [], categories: [], settings: {}, log: [], setup: {} };
+let mFilter = new Set(), fCats = new Set(['__alle']), uCats = new Set(['__alle']);
+let editingId = null, mmCats = new Set(), impRows = [], impHeaders = [];
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const kr = n => Number(n || 0).toLocaleString('nb-NO', { maximumFractionDigits: 2 }) + ' kr';
+const dato = d => d ? new Date(d).toLocaleDateString('nb-NO') : '';
+const today = () => new Date().toISOString().slice(0, 10);
+const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+const fullName = m => [m.fornavn, m.etternavn].filter(Boolean).join(' ') || '(uten navn)';
+function toast(msg, ms = 3500) { const t = $('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', ms); }
+
+/* ───────── API ───────── */
+async function api(path, opts = {}) {
+  const r = await fetch(path, { credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, ...opts });
+  let j = {}; try { j = await r.json(); } catch {}
+  if (r.status === 401 && path !== '/api/login') { showLogin(); throw new Error('Ikke innlogget'); }
+  if (!r.ok) throw new Error(j.error || ('Feil ' + r.status));
+  return j;
+}
+async function save(parts) {
+  try { await api('/api/data', { method: 'PUT', body: JSON.stringify(parts) }); }
+  catch (e) { toast('Kunne ikke lagre: ' + e.message, 6000); throw e; }
+}
+
+/* ───────── Innlogging ───────── */
+function showLogin() { $('app').classList.add('hidden'); $('logoutBtn').classList.add('hidden'); $('login').classList.remove('hidden'); setTimeout(() => $('pw').focus(), 50); }
+async function login() {
+  $('loginErr').classList.add('hidden');
+  try { await api('/api/login', { method: 'POST', body: JSON.stringify({ password: $('pw').value }) }); $('pw').value = ''; await load(); }
+  catch (e) { $('loginErr').textContent = e.message; $('loginErr').classList.remove('hidden'); }
+}
+async function logout() { await fetch('/api/login', { method: 'DELETE' }); showLogin(); }
+
+async function load() {
+  let d;
+  try { d = await api('/api/data'); } catch { return; }
+  S = { members: [], invoices: [], categories: [], settings: {}, log: [], ...d };
+  $('login').classList.add('hidden'); $('app').classList.remove('hidden'); $('logoutBtn').classList.remove('hidden');
+  renderSetup(); renderAll();
+}
+
+function renderSetup() {
+  const st = S.setup || {};
+  let h = '';
+  if (!st.db) h += `<div class="notice bad"><b>Databasen er ikke koblet til ennå.</b> Ingenting kan lagres før dette er gjort – se Innstillinger → Oppsett.</div>`;
+  else if (!st.mail) h += `<div class="notice warn"><b>E-post er ikke satt opp ennå.</b> Du kan registrere medlemmer og fakturaer, men ikke sende e-post. Se Innstillinger → Oppsett.</div>`;
+  $('setupNotice').innerHTML = h;
+  $('setupStatus').innerHTML = `
+    <p>${st.db ? '✅' : '❌'} Database ${st.db ? 'tilkoblet' : '<b>mangler</b> – i Vercel: Storage → Create Database → Upstash for Redis (velg region Frankfurt) → Connect to project.'}</p>
+    <p>${st.mail ? '✅' : '❌'} E-post ${st.mail ? 'satt opp' : '<b>mangler</b> – legg inn SMTP_HOST, SMTP_USER, SMTP_PASS (fra e-postleverandøren til post@kaupangprosjektet.no) under Settings → Environment Variables i Vercel.'}</p>`;
+}
+
+/* ───────── Faner ───────── */
+document.querySelectorAll('nav.tabs button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav.tabs button').forEach(x => x.classList.toggle('active', x === b));
+  document.querySelectorAll('main > section').forEach(s => s.classList.toggle('hidden', s.id !== 'tab-' + b.dataset.tab));
+  renderAll();
+});
+
+function renderAll() { renderMembers(); renderInvoiceForm(); renderInvoices(); renderUtsendelse(); renderSettings(); }
+
+/* ───────── Kategorier ───────── */
+function allCats() {
+  const set = new Set(S.categories || []);
+  S.members.forEach(m => (m.kategorier || []).forEach(c => set.add(c)));
+  return [...set].sort((a, b) => a.localeCompare(b, 'nb'));
+}
+function catCount(c) { return S.members.filter(m => (m.kategorier || []).includes(c)).length; }
+function chipsHtml(selected, withAll, onclick) {
+  let h = withAll ? `<span class="chip ${selected.has('__alle') ? 'on' : ''}" onclick="${onclick}('__alle')">Alle<small>${S.members.length}</small></span>` : '';
+  h += allCats().map(c => `<span class="chip ${selected.has(c) ? 'on' : ''}" onclick="${onclick}('${esc(c).replace(/'/g, "\\'")}')">${esc(c)}<small>${catCount(c)}</small></span>`).join('');
+  return h || '<span class="muted">Ingen kategorier ennå</span>';
+}
+function toggleSel(set, c) {
+  if (c === '__alle') { set.clear(); set.add('__alle'); }
+  else { set.delete('__alle'); set.has(c) ? set.delete(c) : set.add(c); if (!set.size) set.add('__alle'); }
+}
+function membersIn(set) {
+  if (set.has('__alle')) return S.members.slice();
+  return S.members.filter(m => (m.kategorier || []).some(c => set.has(c)));
+}
+
+/* ───────── Medlemmer ───────── */
+function currentYear() { return new Date().getFullYear(); }
+function memberStatus(m) {
+  const y = currentYear();
+  const inv = S.invoices.filter(i => i.memberId === m.id && Number(i.aar) === y);
+  if (!inv.length) return '<span class="status s-none">Ikke fakturert</span>';
+  if (inv.every(i => i.status === 'betalt')) return '<span class="status s-ok">Betalt</span>';
+  if (inv.some(i => i.status !== 'betalt' && i.forfall && i.forfall < today())) return '<span class="status s-bad">Forfalt</span>';
+  return '<span class="status s-warn">Ubetalt</span>';
+}
+function toggleMFilter(c) { if (c === '__alle') mFilter.clear(); else mFilter.has(c) ? mFilter.delete(c) : mFilter.add(c); renderMembers(); }
+function renderMembers() {
+  const q = ($('mSearch').value || '').toLowerCase().trim();
+  const cats = allCats();
+  $('mCatFilter').innerHTML = `<span class="chip ${!mFilter.size ? 'on' : ''}" onclick="toggleMFilter('__alle')">Alle<small>${S.members.length}</small></span>` +
+    cats.map(c => `<span class="chip ${mFilter.has(c) ? 'on' : ''}" onclick="toggleMFilter('${esc(c).replace(/'/g, "\\'")}')">${esc(c)}<small>${catCount(c)}</small></span>`).join('');
+  let list = S.members.filter(m => !mFilter.size || (m.kategorier || []).some(c => mFilter.has(c)));
+  if (q) list = list.filter(m => [m.fornavn, m.etternavn, m.epost, m.telefon, m.sted, m.adresse, m.nr].join(' ').toLowerCase().includes(q));
+  list.sort((a, b) => (a.etternavn || '').localeCompare(b.etternavn || '', 'nb') || (a.fornavn || '').localeCompare(b.fornavn || '', 'nb'));
+  $('mTable').innerHTML = `<tr><th class="hide-sm">Nr</th><th>Navn</th><th>E-post</th><th class="hide-sm">Telefon</th><th class="hide-sm">Sted</th><th>Kategorier</th><th>Kontingent ${currentYear()}</th></tr>` +
+    (list.map(m => `<tr style="cursor:pointer" onclick="editMember('${m.id}')">
+      <td class="hide-sm">${esc(m.nr)}</td><td><b>${esc(fullName(m))}</b></td>
+      <td>${m.epost ? esc(m.epost) : '<span class="status s-warn">Mangler</span>'}</td>
+      <td class="hide-sm">${esc(m.telefon)}</td><td class="hide-sm">${esc(m.sted)}</td>
+      <td>${(m.kategorier || []).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</td>
+      <td>${memberStatus(m)}</td></tr>`).join('') || `<tr><td colspan="7" class="muted" style="padding:20px">Ingen medlemmer${S.members.length ? ' i utvalget' : ' ennå – bruk «Importer» eller «+ Nytt medlem»'}.</td></tr>`);
+  $('mCount').textContent = `Viser ${list.length} av ${S.members.length} medlemmer.`;
+  const utenEpost = S.members.filter(m => !m.epost).length;
+  const y = currentYear(), yi = S.invoices.filter(i => Number(i.aar) === y);
+  const betalt = new Set(yi.filter(i => i.status === 'betalt').map(i => i.memberId)).size;
+  $('memberStats').innerHTML = `
+    <div class="stat"><b>${S.members.length}</b><span>medlemmer</span></div>
+    <div class="stat"><b>${allCats().length}</b><span>kategorier</span></div>
+    <div class="stat"><b>${betalt}</b><span>har betalt ${y}</span></div>
+    <div class="stat"><b>${utenEpost}</b><span>mangler e-post</span></div>`;
+}
+
+function editMember(id) {
+  editingId = id || null;
+  const m = S.members.find(x => x.id === id) || {};
+  $('mmTitle').textContent = id ? fullName(m) : 'Nytt medlem';
+  for (const k of ['Fornavn', 'Etternavn', 'Epost', 'Telefon', 'Adresse', 'Postnr', 'Sted', 'Nr', 'Innmeldt', 'Notat']) $('mm' + k).value = m[k.toLowerCase()] || '';
+  if (!id) { $('mmNr').value = nextMemberNr(); $('mmInnmeldt').value = today(); }
+  mmCats = new Set(m.kategorier || []);
+  renderMmCats();
+  $('mmDelete').style.display = id ? '' : 'none';
+  const inv = S.invoices.filter(i => i.memberId === id).sort((a, b) => (b.aar || 0) - (a.aar || 0));
+  $('mmInvoices').innerHTML = inv.length ? `<p class="f">Fakturaer</p>` + inv.map(i =>
+    `<div class="muted">#${esc(i.nr)} · ${esc(i.tekst)} · ${kr(i.belop)} · ${i.status === 'betalt' ? '✅ betalt ' + dato(i.paidAt) : '⏳ ubetalt'}</div>`).join('') : '';
+  $('memberModal').classList.add('open');
+  setTimeout(() => $('mmFornavn').focus(), 50);
+}
+function renderMmCats() {
+  const cats = [...new Set([...allCats(), ...mmCats])].sort((a, b) => a.localeCompare(b, 'nb'));
+  $('mmCats').innerHTML = cats.map(c => `<span class="chip ${mmCats.has(c) ? 'on' : ''}" onclick="toggleMmCat('${esc(c).replace(/'/g, "\\'")}')">${esc(c)}</span>`).join('') || '<span class="muted">Lag kategorier under Innstillinger</span>';
+}
+function toggleMmCat(c) { mmCats.has(c) ? mmCats.delete(c) : mmCats.add(c); renderMmCats(); }
+function closeModal() { $('memberModal').classList.remove('open'); }
+function nextMemberNr() { return String(S.members.reduce((mx, m) => Math.max(mx, parseInt(m.nr) || 0), 0) + 1); }
+async function saveMember() {
+  const data = {};
+  for (const k of ['Fornavn', 'Etternavn', 'Epost', 'Telefon', 'Adresse', 'Postnr', 'Sted', 'Nr', 'Innmeldt', 'Notat']) data[k.toLowerCase()] = $('mm' + k).value.trim();
+  if (!data.fornavn && !data.etternavn) return toast('Skriv inn navn');
+  data.kategorier = [...mmCats];
+  if (editingId) Object.assign(S.members.find(m => m.id === editingId), data);
+  else S.members.push({ id: uid(), ...data });
+  await save({ members: S.members });
+  closeModal(); renderAll(); toast('Lagret');
+}
+async function deleteMember() {
+  const m = S.members.find(x => x.id === editingId);
+  if (!confirm(`Slette ${fullName(m)}? Fakturaene til medlemmet slettes også.`)) return;
+  S.members = S.members.filter(x => x.id !== editingId);
+  S.invoices = S.invoices.filter(i => i.memberId !== editingId);
+  await save({ members: S.members, invoices: S.invoices });
+  closeModal(); renderAll(); toast('Slettet');
+}
+
+/* ───────── Fakturering ───────── */
+function priceFor(m) {
+  const p = S.settings.priser || {};
+  const vals = (m.kategorier || []).map(c => Number(p[c])).filter(v => v > 0);
+  return vals.length ? Math.max(...vals) : Number(p.__standard) || 0;
+}
+function toggleFCat(c) { toggleSel(fCats, c); renderInvoiceForm(); }
+function renderInvoiceForm() {
+  if (!$('fAar').value) {
+    $('fAar').value = currentYear();
+    const f = new Date(); f.setDate(f.getDate() + 14); $('fForfall').value = f.toISOString().slice(0, 10);
+  }
+  if (!$('fTekst').value) $('fTekst').value = 'Medlemskontingent ' + $('fAar').value;
+  $('fCats').innerHTML = chipsHtml(fCats, true, 'toggleFCat');
+  const p = S.settings.priser || {};
+  const cats = allCats();
+  $('fPriser').innerHTML = cats.map(c => `<div><label class="f">${esc(c)}</label><input type="number" min="0" data-cat="${esc(c)}" value="${p[c] ?? ''}" placeholder="kr" oninput="setPrice(this)" /></div>`).join('') +
+    `<div><label class="f">Standard (uten kategori/pris)</label><input type="number" min="0" data-cat="__standard" value="${p.__standard ?? ''}" placeholder="kr" oninput="setPrice(this)" /></div>`;
+  updateInvoicePreview();
+}
+let priceSaveT;
+function setPrice(el) {
+  S.settings.priser = S.settings.priser || {};
+  S.settings.priser[el.dataset.cat] = el.value === '' ? '' : Number(el.value);
+  updateInvoicePreview();
+  clearTimeout(priceSaveT); priceSaveT = setTimeout(() => save({ settings: S.settings }), 800);
+}
+function invoiceCandidates() {
+  const tekst = $('fTekst').value.trim(), aar = Number($('fAar').value);
+  const already = new Set(S.invoices.filter(i => Number(i.aar) === aar && i.tekst === tekst).map(i => i.memberId));
+  const list = membersIn(fCats);
+  return { list: list.filter(m => !already.has(m.id) && priceFor(m) > 0), dup: list.filter(m => already.has(m.id)).length, noPrice: list.filter(m => !already.has(m.id) && !(priceFor(m) > 0)).length };
+}
+function updateInvoicePreview() {
+  const { list, dup, noPrice } = invoiceCandidates();
+  const sum = list.reduce((s, m) => s + priceFor(m), 0);
+  const utenEpost = list.filter(m => !m.epost).length;
+  let h = `<b>${list.length} fakturaer</b> på til sammen <b>${kr(sum)}</b>.`;
+  if (utenEpost) h += ` ${utenEpost} mangler e-post (de kan skrives ut fra oversikten).`;
+  if (dup) h += ` ${dup} har allerede fått denne fakturaen og hoppes over.`;
+  if (noPrice) h += ` ${noPrice} har ikke noe beløp og hoppes over – fyll inn beløp over.`;
+  if (!S.settings.kontonr) h += ` <br><b>Husk å legge inn kontonummer under Innstillinger.</b>`;
+  $('fPreview').innerHTML = h;
+}
+['fTekst', 'fAar', 'fForfall'].forEach(id => $(id).addEventListener('input', updateInvoicePreview));
+
+function nextInvoiceNr() { return S.invoices.reduce((mx, i) => Math.max(mx, parseInt(i.nr) || 1000), 1000) + 1; }
+async function createInvoices(sendNow) {
+  const { list } = invoiceCandidates();
+  if (!list.length) return toast('Ingen å fakturere');
+  if (sendNow && !S.setup.mail) return toast('E-post er ikke satt opp ennå');
+  if (sendNow && !S.settings.kontonr) return toast('Legg inn kontonummer under Innstillinger først');
+  const tekst = $('fTekst').value.trim(), aar = Number($('fAar').value), forfall = $('fForfall').value;
+  if (!confirm(`${sendNow ? 'Lage og sende' : 'Lage'} ${list.length} fakturaer (${tekst}, forfall ${dato(forfall)})?`)) return;
+  let nr = nextInvoiceNr();
+  const created = list.map(m => ({ id: uid(), nr: String(nr++), memberId: m.id, aar, tekst, belop: priceFor(m), forfall, status: 'ubetalt', createdAt: new Date().toISOString(), reminders: [] }));
+  S.invoices.push(...created);
+  clearTimeout(priceSaveT);
+  await save({ invoices: S.invoices, settings: S.settings });
+  if (sendNow) await sendInvoices('invoice', created.map(i => i.id));
+  else { renderAll(); toast(`${created.length} fakturaer laget`); }
+}
+async function sendInvoices(type, ids) {
+  toast('Sender … ikke lukk siden', 60000);
+  try {
+    const r = await api('/api/send', { method: 'POST', body: JSON.stringify({ type, invoiceIds: ids }) });
+    await load();
+    let msg = `Sendt ${r.sendt} e-post.`;
+    if (r.utenEpost.length) msg += ` ${r.utenEpost.length} uten e-post.`;
+    if (r.feil.length) msg += ` ${r.feil.length} feilet: ${r.feil.slice(0, 3).map(f => f.to).join(', ')}`;
+    toast(msg, 8000);
+  } catch (e) { toast('Sending feilet: ' + e.message, 8000); }
+}
+
+function invStatus(i) {
+  if (i.status === 'betalt') return `<span class="status s-ok">Betalt ${dato(i.paidAt)}</span>`;
+  if (i.forfall && i.forfall < today()) return '<span class="status s-bad">Forfalt</span>';
+  return '<span class="status s-warn">Ubetalt</span>';
+}
+function renderInvoices() {
+  const years = [...new Set(S.invoices.map(i => Number(i.aar)))].sort((a, b) => b - a);
+  const sel = $('iYear').value;
+  $('iYear').innerHTML = `<option value="alle">Alle år</option>` + years.map(y => `<option ${String(y) === sel ? 'selected' : ''}>${y}</option>`).join('');
+  if (!sel && years.includes(currentYear())) $('iYear').value = currentYear();
+  const y = $('iYear').value, st = $('iStatus').value, q = ($('iSearch').value || '').toLowerCase();
+  const byId = Object.fromEntries(S.members.map(m => [m.id, m]));
+  let list = S.invoices.filter(i => y === 'alle' || String(i.aar) === y);
+  const all = list;
+  if (st === 'ubetalt') list = list.filter(i => i.status !== 'betalt');
+  if (st === 'forfalt') list = list.filter(i => i.status !== 'betalt' && i.forfall < today());
+  if (st === 'betalt') list = list.filter(i => i.status === 'betalt');
+  if (q) list = list.filter(i => (fullName(byId[i.memberId] || {}) + ' ' + i.nr).toLowerCase().includes(q));
+  list.sort((a, b) => (parseInt(b.nr) || 0) - (parseInt(a.nr) || 0));
+  $('iTable').innerHTML = `<tr><th>Nr</th><th>Medlem</th><th class="hide-sm">Gjelder</th><th class="num">Beløp</th><th>Forfall</th><th class="hide-sm">Sendt</th><th class="hide-sm">Purret</th><th>Status</th><th>Betalt</th><th></th></tr>` +
+    (list.map(i => { const m = byId[i.memberId] || {}; const n = (i.reminders || []).length; return `<tr>
+      <td>${esc(i.nr)}</td><td><b>${esc(fullName(m))}</b>${m.epost ? '' : ' <span class="status s-warn">uten e-post</span>'}</td>
+      <td class="hide-sm">${esc(i.tekst)}</td><td class="num">${kr(i.belop)}</td><td>${dato(i.forfall)}</td>
+      <td class="hide-sm">${i.sentAt ? dato(i.sentAt) : '<span class="muted">Nei</span>'}</td>
+      <td class="hide-sm">${n ? n + '× (sist ' + dato(i.reminders[n - 1]) + ')' : ''}</td>
+      <td>${invStatus(i)}</td>
+      <td><label class="paid-toggle"><input type="checkbox" ${i.status === 'betalt' ? 'checked' : ''} onchange="togglePaid('${i.id}', this.checked)" /></label></td>
+      <td style="white-space:nowrap">
+        ${i.status !== 'betalt' && m.epost ? `<button class="btn ghost small" onclick="${i.sentAt ? `remindOne('${i.id}')">Purr` : `sendInvoices('invoice',['${i.id}'])">Send`}</button>` : ''}
+        <button class="btn ghost small" onclick="printInvoice('${i.id}')" title="Skriv ut">🖨</button>
+        <button class="btn ghost small" onclick="deleteInvoice('${i.id}')" title="Slett">✕</button>
+      </td></tr>`; }).join('') || `<tr><td colspan="10" class="muted" style="padding:20px">Ingen fakturaer.</td></tr>`);
+  const fakt = all.reduce((s, i) => s + Number(i.belop || 0), 0);
+  const inn = all.filter(i => i.status === 'betalt').reduce((s, i) => s + Number(i.belop || 0), 0);
+  const forfalte = all.filter(i => i.status !== 'betalt' && i.forfall < today());
+  $('invStats').innerHTML = `
+    <div class="stat"><b>${kr(fakt)}</b><span>fakturert ${y === 'alle' ? '' : y}</span></div>
+    <div class="stat"><b>${kr(inn)}</b><span>innbetalt</span></div>
+    <div class="stat"><b>${kr(fakt - inn)}</b><span>utestående</span></div>
+    <div class="stat"><b>${forfalte.length}</b><span>forfalte</span></div>`;
+  const purrbare = forfalte.filter(i => (byId[i.memberId] || {}).epost);
+  $('purrAllBtn').textContent = `Send purring til alle forfalte (${purrbare.length})`;
+  $('purrAllBtn').disabled = !purrbare.length;
+}
+async function togglePaid(id, on) {
+  const i = S.invoices.find(x => x.id === id);
+  i.status = on ? 'betalt' : 'ubetalt'; i.paidAt = on ? today() : null;
+  await save({ invoices: S.invoices }); renderAll();
+}
+async function deleteInvoice(id) {
+  if (!confirm('Slette fakturaen?')) return;
+  S.invoices = S.invoices.filter(i => i.id !== id);
+  await save({ invoices: S.invoices }); renderAll();
+}
+function remindOne(id) { if (confirm('Sende purring på denne fakturaen?')) sendInvoices('reminder', [id]); }
+function remindAll() {
+  const y = $('iYear').value;
+  const byId = Object.fromEntries(S.members.map(m => [m.id, m]));
+  const ids = S.invoices.filter(i => (y === 'alle' || String(i.aar) === y) && i.status !== 'betalt' && i.forfall < today() && (byId[i.memberId] || {}).epost).map(i => i.id);
+  if (!ids.length) return;
+  if (!S.setup.mail) return toast('E-post er ikke satt opp ennå');
+  if (confirm(`Sende purring til ${ids.length} medlemmer som ikke har betalt?`)) sendInvoices('reminder', ids);
+}
+function printInvoice(id) {
+  const i = S.invoices.find(x => x.id === id), m = S.members.find(x => x.id === i.memberId) || {}, s = S.settings;
+  const w = window.open('', '_blank');
+  w.document.write(`<!doctype html><meta charset="utf-8"><title>Faktura ${esc(i.nr)}</title>
+  <body style="font-family:Georgia,serif;max-width:640px;margin:40px auto;color:#2C1A0E">
+  <h1 style="margin:0">${esc(s.orgName)}</h1>${s.orgnr ? `<div>Org.nr. ${esc(s.orgnr)}</div>` : ''}
+  <div style="margin:40px 0 30px">${esc(fullName(m))}<br>${esc(m.adresse)}<br>${esc(m.postnr)} ${esc(m.sted)}</div>
+  <h2>Faktura ${esc(i.nr)}</h2>
+  <p style="white-space:pre-line">${esc(String(s.fakturaTekst || '').replace(/\{aar\}/g, i.aar).replace(/\{fornavn\}/g, m.fornavn || ''))}</p>
+  <table style="width:100%;border-collapse:collapse">${[['Gjelder', i.tekst], ['Beløp', kr(i.belop)], ['Forfall', dato(i.forfall)], ['Kontonummer', s.kontonr], ['Merk betalingen', 'Faktura ' + i.nr + ' – ' + fullName(m)]].concat(s.vipps ? [['Vipps', '#' + s.vipps]] : [])
+    .map(r => `<tr><td style="padding:8px;border-bottom:1px solid #ddd">${esc(r[0])}</td><td style="padding:8px;border-bottom:1px solid #ddd"><b>${esc(r[1])}</b></td></tr>`).join('')}</table>
+  <p style="white-space:pre-line;margin-top:30px">${esc(s.signatur)}</p><script>print()<\/script>`);
+  w.document.close();
+}
+
+/* ───────── Utsendelse ───────── */
+function toggleUCat(c) { toggleSel(uCats, c); renderUtsendelse(); }
+function renderUtsendelse() {
+  $('uCats').innerHTML = chipsHtml(uCats, true, 'toggleUCat');
+  const list = membersIn(uCats), med = list.filter(m => m.epost).length;
+  $('uCount').innerHTML = `<b>${med}</b> ${med === 1 ? 'mottaker' : 'mottakere'} med e-post` + (list.length - med ? ` · ${list.length - med} uten e-post får ikke meldingen` : '');
+  $('logTable').innerHTML = `<tr><th>Dato</th><th>Type</th><th>Emne</th><th class="num">Sendt</th><th class="num">Feil</th></tr>` +
+    ((S.log || []).map(l => `<tr><td>${new Date(l.at).toLocaleString('nb-NO', { dateStyle: 'short', timeStyle: 'short' })}</td>
+      <td>${{ info: 'Info', invoice: 'Faktura', reminder: 'Purring' }[l.type] || l.type}</td><td>${esc(l.subject)}</td>
+      <td class="num">${l.antall}</td><td class="num">${l.feil || ''}</td></tr>`).join('') || `<tr><td colspan="5" class="muted" style="padding:16px">Ingenting sendt ennå.</td></tr>`);
+}
+async function sendInfo() {
+  const list = membersIn(uCats).filter(m => m.epost);
+  const subject = $('uSubject').value.trim(), body = $('uBody').value.trim();
+  if (!subject || !body) return toast('Fyll inn emne og melding');
+  if (!list.length) return toast('Ingen mottakere med e-post');
+  if (!S.setup.mail) return toast('E-post er ikke satt opp ennå');
+  const hvem = uCats.has('__alle') ? 'alle medlemmer' : [...uCats].join(', ');
+  if (!confirm(`Sende «${subject}» til ${list.length} mottakere (${hvem})?`)) return;
+  toast('Sender … ikke lukk siden', 60000);
+  try {
+    const r = await api('/api/send', { method: 'POST', body: JSON.stringify({ type: 'info', subject, body, memberIds: list.map(m => m.id) }) });
+    $('uSubject').value = ''; $('uBody').value = '';
+    await load();
+    toast(`Sendt til ${r.sendt} ${r.sendt === 1 ? 'mottaker' : 'mottakere'}.` + (r.feil.length ? ` ${r.feil.length} feilet.` : ''), 8000);
+  } catch (e) { toast('Sending feilet: ' + e.message, 8000); }
+}
+function copyEmails() {
+  const list = membersIn(uCats).filter(m => m.epost).map(m => m.epost);
+  navigator.clipboard.writeText(list.join('; ')).then(() => toast(`${list.length} adresser kopiert – lim inn i Bcc-feltet`));
+}
+
+/* ───────── Import ───────── */
+const FIELDS = [
+  ['fornavn', 'Fornavn', /^(fornavn|first ?name)$/],
+  ['etternavn', 'Etternavn', /^(etternavn|last ?name|surname)$/],
+  ['navn', 'Fullt navn', /^(navn|fullt navn|name|medlem)$/],
+  ['epost', 'E-post', /(e-?post|email|e-?mail|mail)/],
+  ['telefon', 'Telefon', /(telefon|mobil|tlf|phone)/],
+  ['adresse', 'Adresse', /(adresse|address|gate)/],
+  ['postnr', 'Postnr.', /(post ?n(ummer|r)|zip)/],
+  ['sted', 'Sted', /^(sted|poststed|by|city)$/],
+  ['kategori', 'Kategori', /(kategori|medlemstype|type|gruppe|category)/],
+  ['nr', 'Medlemsnr.', /(medlems ?n(ummer|r)|^nr\.?$|^id$)/],
+  ['innmeldt', 'Innmeldt', /(innmeldt|dato|registrert|joined)/],
+  ['notat', 'Notat', /(notat|kommentar|merknad|note)/],
+];
+async function readImport(file) {
+  if (!file) return;
+  let rows;
+  if (/\.(xlsx|xls)$/i.test(file.name)) {
+    if (!window.XLSX) return toast('Excel-leseren lastes fortsatt – prøv igjen om et sekund');
+    const wb = XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: true });
+    rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: false, defval: '' });
+  } else {
+    const buf = await file.arrayBuffer();
+    let text = new TextDecoder('utf-8').decode(buf);
+    if (text.includes('\uFFFD')) text = new TextDecoder('windows-1252').decode(buf);
+    rows = parseCsv(text.replace(/^\uFEFF/, ''));
+  }
+  rows = rows.filter(r => r.some(c => String(c).trim()));
+  if (rows.length < 2) return toast('Fant ingen rader i filen');
+  impHeaders = rows[0].map(h => String(h).trim());
+  impRows = rows.slice(1);
+  $('impCols').innerHTML = FIELDS.map(([key, label, rx]) => {
+    const idx = impHeaders.findIndex(h => rx.test(h.toLowerCase()));
+    return `<div><label class="f">${label}</label><select data-field="${key}" onchange="renderImpPreview()"><option value="-1">– ikke i filen –</option>${impHeaders.map((h, i) => `<option value="${i}" ${i === idx ? 'selected' : ''}>${esc(h)}</option>`).join('')}</select></div>`;
+  }).join('');
+  $('impMap').classList.remove('hidden');
+  $('impN').textContent = impRows.length;
+  renderImpPreview();
+}
+function parseCsv(text) {
+  const first = text.split(/\r?\n/)[0];
+  const delim = [';', '\t', ','].sort((a, b) => first.split(b).length - first.split(a).length)[0];
+  const rows = []; let row = [], cur = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+    else if (c === '"') q = true;
+    else if (c === delim) { row.push(cur); cur = ''; }
+    else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cur); rows.push(row); row = []; cur = ''; }
+    else cur += c;
+  }
+  if (cur || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+function impMapping() { const m = {}; document.querySelectorAll('#impCols select').forEach(s => m[s.dataset.field] = Number(s.value)); return m; }
+function toIsoDate(v) {
+  v = String(v || '').trim(); if (!v) return '';
+  let m = v.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{2,4})$/);
+  if (m) { const y = m[3].length === 2 ? '20' + m[3] : m[3]; return `${y}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`; }
+  const d = new Date(v); return isNaN(d) ? '' : d.toISOString().slice(0, 10);
+}
+function rowToMember(r, map) {
+  const g = k => map[k] >= 0 ? String(r[map[k]] ?? '').trim() : '';
+  let fornavn = g('fornavn'), etternavn = g('etternavn');
+  if (!fornavn && !etternavn && g('navn')) {
+    const n = g('navn');
+    if (n.includes(',')) { [etternavn, fornavn] = n.split(',').map(s => s.trim()); }
+    else { const p = n.split(/\s+/); etternavn = p.length > 1 ? p.pop() : ''; fornavn = p.join(' '); }
+  }
+  const kategorier = g('kategori').split(/[,;\/|]/).map(s => s.trim()).filter(Boolean);
+  const extra = $('impExtraCat').value.trim(); if (extra) kategorier.push(extra);
+  return { fornavn, etternavn, epost: g('epost').toLowerCase(), telefon: g('telefon'), adresse: g('adresse'), postnr: g('postnr'), sted: g('sted'), nr: g('nr'), innmeldt: toIsoDate(g('innmeldt')), notat: g('notat'), kategorier: [...new Set(kategorier)] };
+}
+function renderImpPreview() {
+  const map = impMapping();
+  const prev = impRows.slice(0, 5).map(r => rowToMember(r, map));
+  $('impPreview').innerHTML = `<tr><th>Navn</th><th>E-post</th><th>Telefon</th><th>Adresse</th><th>Kategorier</th></tr>` +
+    prev.map(m => `<tr><td>${esc(fullName(m))}</td><td>${esc(m.epost)}</td><td>${esc(m.telefon)}</td><td>${esc([m.adresse, m.postnr, m.sted].filter(Boolean).join(', '))}</td><td>${m.kategorier.map(c => `<span class="tag">${esc(c)}</span>`).join('')}</td></tr>`).join('');
+}
+async function doImport() {
+  const map = impMapping();
+  const incoming = impRows.map(r => rowToMember(r, map)).filter(m => m.fornavn || m.etternavn || m.epost);
+  let nye = 0, oppdatert = 0, nextNr = parseInt(nextMemberNr());
+  const key = m => m.epost || (fullName(m).toLowerCase());
+  const existing = new Map(S.members.map(m => [key(m), m]));
+  for (const inc of incoming) {
+    const old = existing.get(key(inc));
+    if (old) {
+      for (const [k, v] of Object.entries(inc)) if (k !== 'kategorier' && v) old[k] = v;
+      old.kategorier = [...new Set([...(old.kategorier || []), ...inc.kategorier])];
+      oppdatert++;
+    } else {
+      const m = { id: uid(), ...inc, nr: inc.nr || String(nextNr++) };
+      S.members.push(m); existing.set(key(m), m); nye++;
+    }
+  }
+  S.categories = allCats();
+  await save({ members: S.members, categories: S.categories });
+  $('impMap').classList.add('hidden'); $('impFile').value = '';
+  renderAll(); toast(`Import ferdig: ${nye} nye, ${oppdatert} oppdatert`, 6000);
+}
+function downloadTemplate() {
+  const csv = '\uFEFFFornavn;Etternavn;E-post;Telefon;Adresse;Postnr;Sted;Kategori;Innmeldt\nOla;Nordmann;ola@eksempel.no;900 00 000;Kaupangveien 1;3261;Larvik;Enkeltmedlem;01.01.2024\nKari;Nordmann;kari@eksempel.no;;Kaupangveien 1;3261;Larvik;Familie, Frivillig;15.03.2025\n';
+  download('medlemmer-mal.csv', csv);
+}
+function exportCsv() {
+  const head = ['Medlemsnr', 'Fornavn', 'Etternavn', 'E-post', 'Telefon', 'Adresse', 'Postnr', 'Sted', 'Kategorier', 'Innmeldt', 'Notat', 'Kontingent ' + currentYear()];
+  const y = currentYear();
+  const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const rows = S.members.map(m => {
+    const inv = S.invoices.filter(i => i.memberId === m.id && Number(i.aar) === y);
+    const st = !inv.length ? 'Ikke fakturert' : inv.every(i => i.status === 'betalt') ? 'Betalt' : 'Ubetalt';
+    return [m.nr, m.fornavn, m.etternavn, m.epost, m.telefon, m.adresse, m.postnr, m.sted, (m.kategorier || []).join(', '), m.innmeldt, m.notat, st].map(q).join(';');
+  });
+  download(`medlemmer-${today()}.csv`, '\uFEFF' + head.map(q).join(';') + '\n' + rows.join('\n'));
+}
+function download(name, text) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
+  a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+/* ───────── Innstillinger ───────── */
+const SET_FIELDS = { sOrgName: 'orgName', sKontonr: 'kontonr', sVipps: 'vipps', sOrgnr: 'orgnr', sFakturaTekst: 'fakturaTekst', sPurreTekst: 'purreTekst', sSignatur: 'signatur' };
+function renderSettings() {
+  for (const [id, k] of Object.entries(SET_FIELDS)) if (document.activeElement !== $(id)) $(id).value = S.settings[k] || '';
+  $('catList').innerHTML = allCats().map(c => `<span class="chip">${esc(c)}<small>${catCount(c)}</small>
+    <a href="#" onclick="renameCat('${esc(c).replace(/'/g, "\\'")}');return false" title="Endre navn" style="margin-left:6px;text-decoration:none">✎</a>
+    <a href="#" onclick="removeCat('${esc(c).replace(/'/g, "\\'")}');return false" title="Slett" style="margin-left:4px;text-decoration:none;color:var(--bad)">✕</a></span>`).join('') || '<span class="muted">Ingen kategorier ennå</span>';
+}
+async function saveSettings() {
+  for (const [id, k] of Object.entries(SET_FIELDS)) S.settings[k] = $(id).value.trim();
+  await save({ settings: S.settings }); toast('Innstillinger lagret'); renderAll();
+}
+async function addCat() {
+  const c = $('newCat').value.trim(); if (!c) return;
+  S.categories = [...new Set([...(S.categories || []), c])];
+  $('newCat').value = '';
+  await save({ categories: S.categories }); renderAll();
+}
+async function renameCat(c) {
+  const n = prompt('Nytt navn på kategorien:', c); if (!n || n === c) return;
+  S.members.forEach(m => { if ((m.kategorier || []).includes(c)) m.kategorier = [...new Set(m.kategorier.map(x => x === c ? n : x))]; });
+  S.categories = (S.categories || []).map(x => x === c ? n : x);
+  if (S.settings.priser && c in S.settings.priser) { S.settings.priser[n] = S.settings.priser[c]; delete S.settings.priser[c]; }
+  await save({ members: S.members, categories: S.categories, settings: S.settings }); renderAll();
+}
+async function removeCat(c) {
+  const n = catCount(c);
+  if (!confirm(`Slette kategorien «${c}»?${n ? ` Den fjernes fra ${n} medlemmer (medlemmene slettes ikke).` : ''}`)) return;
+  S.members.forEach(m => m.kategorier = (m.kategorier || []).filter(x => x !== c));
+  S.categories = (S.categories || []).filter(x => x !== c);
+  await save({ members: S.members, categories: S.categories }); renderAll();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+$('memberModal').addEventListener('click', e => { if (e.target.id === 'memberModal') closeModal(); });
+load();
+</script>
+</body>
+</html>

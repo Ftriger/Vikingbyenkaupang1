@@ -1,0 +1,9 @@
+{
+  "name": "kaupang-vikingby",
+  "private": true,
+  "description": "Kaupang Vikingby – nettside med medlemsregister",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "nodemailer": "^6.9.16"
+  }
+}

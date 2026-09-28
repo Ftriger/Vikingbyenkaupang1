@@ -1,4 +1,6 @@
 User-agent: *
 Allow: /
+Disallow: /medlemmer.html
+Disallow: /api/
 
 Sitemap: https://kaupangvikingby.no/sitemap.xml

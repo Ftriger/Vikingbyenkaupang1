@@ -133,7 +133,7 @@
       <div class="stats" id="memberStats"></div>
       <div class="card">
         <div class="row" style="margin-bottom:12px">
-          <input type="search" id="mSearch" class="grow" placeholder="Søk navn, e-post, telefon, sted …" oninput="renderMembers()" />
+          <input type="search" id="mSearch" autocomplete="off" name="kp-sok-medlem" class="grow" placeholder="Søk navn, e-post, telefon, sted …" oninput="renderMembers()" />
           <button class="btn" onclick="editMember()">+ Nytt medlem</button>
           <button class="btn ghost" onclick="exportCsv()">Last ned Excel/CSV</button>
         </div>
@@ -173,7 +173,7 @@
             <option value="alle">Alle</option><option value="ubetalt">Ubetalte</option>
             <option value="forfalt">Forfalte (ubetalt)</option><option value="betalt">Betalte</option>
           </select>
-          <input type="search" id="iSearch" placeholder="Søk navn / nr" style="width:180px" oninput="renderInvoices()" />
+          <input type="search" id="iSearch" autocomplete="off" name="kp-sok-faktura" placeholder="Søk navn / nr" style="width:180px" oninput="renderInvoices()" />
         </div>
         <div class="row" style="margin-bottom:12px">
           <button class="btn danger" id="purrAllBtn" onclick="remindAll()">Send purring til alle forfalte</button>
@@ -195,7 +195,7 @@
         <div class="chips" id="uCats"></div>
         <div id="uPick" class="hidden">
           <div class="row" style="margin-bottom:8px">
-            <input type="search" id="uSearch" class="grow" placeholder="Søk navn eller e-post …" oninput="renderUPick()" />
+            <input type="search" id="uSearch" autocomplete="off" name="kp-sok-mottaker" class="grow" placeholder="Søk navn eller e-post …" oninput="renderUPick()" />
             <select id="uPickCat" style="width:auto" onchange="renderUPick()"></select>
             <button class="btn ghost small" onclick="pickVisible(true)">Velg alle synlige</button>
             <button class="btn ghost small" onclick="pickVisible(false)">Fjern alle</button>
@@ -421,7 +421,7 @@ function renderMembers() {
       <td class="hide-sm">${esc(m.telefon)}</td><td class="hide-sm">${esc(m.sted)}</td>
       <td>${(m.kategorier || []).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</td>
       <td>${memberStatus(m)}</td></tr>`).join('') || `<tr><td colspan="7" class="muted" style="padding:20px">Ingen medlemmer${S.members.length ? ' i utvalget' : ' ennå – bruk «Importer» eller «+ Nytt medlem»'}.</td></tr>`);
-  $('mCount').textContent = `Viser ${list.length} av ${S.members.length} medlemmer.`;
+  $('mCount').innerHTML = `Viser ${list.length} av ${S.members.length} medlemmer.` + (q ? ` <a href="#" onclick="$('mSearch').value='';renderMembers();return false">Tøm søk</a>` : '');
   const utenEpost = S.members.filter(m => !m.epost).length;
   const y = currentYear(), yi = S.invoices.filter(i => Number(i.aar) === y);
   const betalt = new Set(yi.filter(i => i.status === 'betalt').map(i => i.memberId)).size;
@@ -506,6 +506,11 @@ function setPrice(el) {
   clearTimeout(priceSaveT); priceSaveT = setTimeout(() => save({ settings: S.settings }), 800);
 }
 const invMembers = i => [i.memberId, ...(i.andre || [])];
+function invKat(i) {
+  if (i.kategori) return i.kategori;
+  const m = S.members.find(x => x.id === i.memberId) || {}, p = S.settings.priser || {};
+  return (m.kategorier || []).find(c => Number(p[c]) === Number(i.belop)) || '';
+}
 const invNames = i => invMembers(i).map(id => S.members.find(m => m.id === id)).filter(Boolean).map(fullName).join(', ');
 // Familiemedlemskap: medlemmer i en familie-kategori med samme e-post (eller samme adresse) får én felles faktura.
 function familyKey(m) {
@@ -593,7 +598,7 @@ function renderInvoices() {
   $('iTable').innerHTML = `<tr><th>Nr</th><th>Medlem</th><th class="hide-sm">Gjelder</th><th class="num">Beløp</th><th>Forfall</th><th class="hide-sm">Sendt</th><th class="hide-sm">Purret</th><th>Status</th><th>Betalt</th><th></th></tr>` +
     (list.map(i => { const m = byId[i.memberId] || {}; const n = (i.reminders || []).length; return `<tr>
       <td>${esc(i.nr)}</td><td><b>${esc(fullName(m))}</b>${(i.andre || []).length ? `<div class="muted">+ ${esc(invNames(i).split(', ').slice(1).join(', '))}</div>` : ''}${m.epost ? '' : ' <span class="status s-warn">uten e-post</span>'}</td>
-      <td class="hide-sm">${esc(i.tekst)}${i.kategori ? ` <span class="tag">${esc(i.kategori)}</span>` : ''}</td><td class="num">${kr(i.belop)}</td><td>${dato(i.forfall)}</td>
+      <td class="hide-sm">${esc(i.tekst)}${invKat(i) ? ` <span class="tag">${esc(invKat(i))}</span>` : ''}</td><td class="num">${kr(i.belop)}</td><td>${dato(i.forfall)}</td>
       <td class="hide-sm">${i.sentAt ? dato(i.sentAt) : '<span class="muted">Nei</span>'}</td>
       <td class="hide-sm">${n ? n + '× (sist ' + dato(i.reminders[n - 1]) + ')' : ''}</td>
       <td>${invStatus(i)}</td>
@@ -635,6 +640,7 @@ function remindAll() {
   if (confirm(`Sende purring til ${ids.length} medlemmer som ikke har betalt?`)) sendInvoices('reminder', ids);
 }
 function printInvoice(id) {
+  if (!S.settings.kontonr && !confirm('Kontonummer mangler under Innstillinger. Skrive ut likevel?')) return;
   const i = S.invoices.find(x => x.id === id), m = S.members.find(x => x.id === i.memberId) || {}, s = S.settings;
   const w = window.open('', '_blank');
   w.document.write(`<!doctype html><meta charset="utf-8"><title>Faktura ${esc(i.nr)}</title>
@@ -643,7 +649,7 @@ function printInvoice(id) {
   <div style="margin:40px 0 30px">${esc(fullName(m))}<br>${esc(m.adresse)}<br>${esc(m.postnr)} ${esc(m.sted)}</div>
   <h2>Faktura ${esc(i.nr)}</h2>
   <p style="white-space:pre-line">${esc(String(s.fakturaTekst || '').replace(/\{aar\}/g, i.aar).replace(/\{fornavn\}/g, m.fornavn || ''))}</p>
-  <table style="width:100%;border-collapse:collapse">${[['Gjelder', i.tekst]].concat((i.andre || []).length ? [['Gjelder medlemmene', invNames(i)]] : []).concat(i.kategori ? [['Medlemskap', i.kategori + ' – ' + kr(i.belop)]] : []).concat([['Beløp', kr(i.belop)], ['Forfall', dato(i.forfall)], ['Kontonummer', s.kontonr], ['Merk betalingen', 'Faktura ' + i.nr + ' – ' + fullName(m)]]).concat(s.vipps ? [['Vipps', '#' + s.vipps]] : [])
+  <table style="width:100%;border-collapse:collapse">${[['Gjelder', i.tekst]].concat((i.andre || []).length ? [['Gjelder medlemmene', invNames(i)]] : []).concat(invKat(i) ? [['Medlemskap', invKat(i) + ' – ' + kr(i.belop)]] : []).concat([['Beløp', kr(i.belop)], ['Forfall', dato(i.forfall)], ['Kontonummer', s.kontonr], ['Merk betalingen', 'Faktura ' + i.nr + ' – ' + fullName(m)]]).concat(s.vipps ? [['Vipps', '#' + s.vipps]] : [])
     .map(r => `<tr><td style="padding:8px;border-bottom:1px solid #ddd">${esc(r[0])}</td><td style="padding:8px;border-bottom:1px solid #ddd"><b>${esc(r[1])}</b></td></tr>`).join('')}</table>
   <p style="white-space:pre-line;margin-top:30px">${esc(s.signatur)}</p><script>print()<\/script>`);
   w.document.close();

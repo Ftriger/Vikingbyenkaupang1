@@ -15,13 +15,19 @@ function wrapHtml(settings, inner) {
   <p style="white-space:pre-line;margin-top:24px">${esc(settings.signatur)}</p></div></div>`;
 }
 
-function fakturaMail(settings, m, inv, purring) {
+function fakturaMail(settings, m, inv, purring, byIdAll = {}) {
   const navn = [m.fornavn, m.etternavn].filter(Boolean).join(' ');
   const intro = fyll(purring ? settings.purreTekst : settings.fakturaTekst, m, inv);
   const tittel = purring ? `Påminnelse: faktura ${inv.nr}` : `Faktura ${inv.nr}`;
+  const alle = [m, ...((inv.andre || []).map(id => byIdAll[id]).filter(Boolean))];
   const rader = [
-    ['Fakturanr.', inv.nr], ['Medlem', navn + (m.nr ? ` (medlemsnr. ${m.nr})` : '')],
-    ['Gjelder', inv.tekst || `Medlemskontingent ${inv.aar}`], ['Beløp', kr(inv.belop)],
+    ['Fakturanr.', inv.nr],
+    alle.length > 1
+      ? ['Medlemmer', alle.map(x => [x.fornavn, x.etternavn].filter(Boolean).join(' ')).join(', ')]
+      : ['Medlem', navn + (m.nr ? ` (medlemsnr. ${m.nr})` : '')],
+    ['Gjelder', inv.tekst || `Medlemskontingent ${inv.aar}`],
+    ...(inv.kategori ? [['Medlemskap', `${inv.kategori} – ${kr(inv.belop)}`]] : []),
+    ['Beløp', kr(inv.belop)],
     ['Forfall', dato(inv.forfall)], ['Kontonummer', settings.kontonr || '—'],
     ['Merk betalingen', `Faktura ${inv.nr} – ${navn}`],
   ];
@@ -52,8 +58,12 @@ module.exports = async (req, res) => {
   if (body.type === 'info') {
     if (!body.subject || !body.body) return send(res, 400, { error: 'Mangler emne eller tekst' });
     targets = (body.memberIds || []).map(id => byId[id]).filter(Boolean);
+    const seen = new Set();
     for (const m of targets) {
       if (!m.epost) { utenEpost.push(m.id); continue; }
+      const adr = m.epost.toLowerCase();
+      if (seen.has(adr)) continue; // familie med felles e-post får én e-post
+      seen.add(adr);
       const txt = fyll(body.body, m);
       msgs.push({
         to: m.epost, subject: fyll(body.subject, m),
@@ -69,9 +79,14 @@ module.exports = async (req, res) => {
       if (purring && inv.status === 'betalt') continue;
       const m = byId[inv.memberId];
       if (!m) continue;
+      if (!inv.kategori) {
+        const p = settings.priser || {};
+        const c = (m.kategorier || []).filter(k => Number(p[k]) > 0).sort((a, b) => Number(p[b]) - Number(p[a]))[0];
+        if (c && Number(p[c]) === Number(inv.belop)) inv.kategori = c;
+      }
       targets.push(inv);
       if (!m.epost) { utenEpost.push(m.id); continue; }
-      msgs.push({ ...fakturaMail(settings, m, inv, purring), _inv: inv.id });
+      msgs.push({ ...fakturaMail(settings, m, inv, purring, byId), _inv: inv.id });
     }
   } else {
     return send(res, 400, { error: 'Ukjent type' });

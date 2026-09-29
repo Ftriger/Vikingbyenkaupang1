@@ -188,7 +188,20 @@
       <div class="card">
         <h2>Send informasjon til medlemmene</h2>
         <p class="f" style="margin:0 0 6px">Mottakere</p>
+        <div class="chips" style="margin-bottom:10px">
+          <span class="chip on" id="uModeKat" onclick="setUMode('kat')">Alle / kategorier</span>
+          <span class="chip" id="uModeVelg" onclick="setUMode('velg')">Velg medlemmer selv</span>
+        </div>
         <div class="chips" id="uCats"></div>
+        <div id="uPick" class="hidden">
+          <div class="row" style="margin-bottom:8px">
+            <input type="search" id="uSearch" class="grow" placeholder="Søk navn eller e-post …" oninput="renderUPick()" />
+            <select id="uPickCat" style="width:auto" onchange="renderUPick()"></select>
+            <button class="btn ghost small" onclick="pickVisible(true)">Velg alle synlige</button>
+            <button class="btn ghost small" onclick="pickVisible(false)">Fjern alle</button>
+          </div>
+          <div class="tw" style="max-height:320px;overflow-y:auto"><table id="uPickTable"></table></div>
+        </div>
         <p class="muted" id="uCount"></p>
         <div style="margin-top:12px"><label class="f">Emne</label><input type="text" id="uSubject" placeholder="F.eks. Innkalling til årsmøte" /></div>
         <div style="margin-top:12px"><label class="f">Melding</label>
@@ -386,7 +399,7 @@ function membersIn(set) {
 function currentYear() { return new Date().getFullYear(); }
 function memberStatus(m) {
   const y = currentYear();
-  const inv = S.invoices.filter(i => i.memberId === m.id && Number(i.aar) === y);
+  const inv = S.invoices.filter(i => invMembers(i).includes(m.id) && Number(i.aar) === y);
   if (!inv.length) return '<span class="status s-none">Ikke fakturert</span>';
   if (inv.every(i => i.status === 'betalt')) return '<span class="status s-ok">Betalt</span>';
   if (inv.some(i => i.status !== 'betalt' && i.forfall && i.forfall < today())) return '<span class="status s-bad">Forfalt</span>';
@@ -428,7 +441,7 @@ function editMember(id) {
   mmCats = new Set(m.kategorier || []);
   renderMmCats();
   $('mmDelete').style.display = id ? '' : 'none';
-  const inv = S.invoices.filter(i => i.memberId === id).sort((a, b) => (b.aar || 0) - (a.aar || 0));
+  const inv = S.invoices.filter(i => invMembers(i).includes(id)).sort((a, b) => (b.aar || 0) - (a.aar || 0));
   $('mmInvoices').innerHTML = inv.length ? `<p class="f">Fakturaer</p>` + inv.map(i =>
     `<div class="muted">#${esc(i.nr)} · ${esc(i.tekst)} · ${kr(i.belop)} · ${i.status === 'betalt' ? '✅ betalt ' + dato(i.paidAt) : '⏳ ubetalt'}</div>`).join('') : '';
   $('memberModal').classList.add('open');
@@ -461,10 +474,15 @@ async function deleteMember() {
 }
 
 /* ───────── Fakturering ───────── */
-function priceFor(m) {
+function priceCat(m) {
   const p = S.settings.priser || {};
-  const vals = (m.kategorier || []).map(c => Number(p[c])).filter(v => v > 0);
-  return vals.length ? Math.max(...vals) : Number(p.__standard) || 0;
+  let best = null;
+  for (const c of (m.kategorier || [])) if (Number(p[c]) > 0 && (!best || Number(p[c]) > Number(p[best]))) best = c;
+  return best;
+}
+function priceFor(m) {
+  const p = S.settings.priser || {}, c = priceCat(m);
+  return c ? Number(p[c]) : Number(p.__standard) || 0;
 }
 function toggleFCat(c) { toggleSel(fCats, c); renderInvoiceForm(); }
 function renderInvoiceForm() {
@@ -487,17 +505,36 @@ function setPrice(el) {
   updateInvoicePreview();
   clearTimeout(priceSaveT); priceSaveT = setTimeout(() => save({ settings: S.settings }), 800);
 }
+const invMembers = i => [i.memberId, ...(i.andre || [])];
+const invNames = i => invMembers(i).map(id => S.members.find(m => m.id === id)).filter(Boolean).map(fullName).join(', ');
+// Familiemedlemskap: medlemmer i en familie-kategori med samme e-post (eller samme adresse) får én felles faktura.
+function familyKey(m) {
+  const c = priceCat(m);
+  if (!c || !/famil/i.test(c)) return null;
+  const k = (m.epost || '').toLowerCase() || [m.adresse, m.postnr].filter(Boolean).join('|').toLowerCase() || (m.etternavn || '').toLowerCase();
+  return k ? c + '#' + k : null;
+}
 function invoiceCandidates() {
   const tekst = $('fTekst').value.trim(), aar = Number($('fAar').value);
-  const already = new Set(S.invoices.filter(i => Number(i.aar) === aar && i.tekst === tekst).map(i => i.memberId));
-  const list = membersIn(fCats);
-  return { list: list.filter(m => !already.has(m.id) && priceFor(m) > 0), dup: list.filter(m => already.has(m.id)).length, noPrice: list.filter(m => !already.has(m.id) && !(priceFor(m) > 0)).length };
+  const already = new Set(S.invoices.filter(i => Number(i.aar) === aar && i.tekst === tekst).flatMap(invMembers));
+  const all = membersIn(fCats);
+  const open = all.filter(m => !already.has(m.id) && priceFor(m) > 0);
+  const list = [], fam = {};
+  for (const m of open) {
+    const k = familyKey(m);
+    if (k && fam[k]) { fam[k].andre.push(m.id); continue; }
+    const g = { ...m, andre: [] };
+    if (k) fam[k] = g;
+    list.push(g);
+  }
+  return { list, samlet: open.length - list.length, dup: all.filter(m => already.has(m.id)).length, noPrice: all.filter(m => !already.has(m.id) && !(priceFor(m) > 0)).length };
 }
 function updateInvoicePreview() {
-  const { list, dup, noPrice } = invoiceCandidates();
+  const { list, dup, noPrice, samlet } = invoiceCandidates();
   const sum = list.reduce((s, m) => s + priceFor(m), 0);
   const utenEpost = list.filter(m => !m.epost).length;
   let h = `<b>${list.length} fakturaer</b> på til sammen <b>${kr(sum)}</b>.`;
+  if (samlet) h += ` Familiemedlemmer med samme e-post/adresse får én felles faktura (${samlet} slått sammen).`;
   if (utenEpost) h += ` ${utenEpost} mangler e-post (de kan skrives ut fra oversikten).`;
   if (dup) h += ` ${dup} har allerede fått denne fakturaen og hoppes over.`;
   if (noPrice) h += ` ${noPrice} har ikke noe beløp og hoppes over – fyll inn beløp over.`;
@@ -515,7 +552,7 @@ async function createInvoices(sendNow) {
   const tekst = $('fTekst').value.trim(), aar = Number($('fAar').value), forfall = $('fForfall').value;
   if (!confirm(`${sendNow ? 'Lage og sende' : 'Lage'} ${list.length} fakturaer (${tekst}, forfall ${dato(forfall)})?`)) return;
   let nr = nextInvoiceNr();
-  const created = list.map(m => ({ id: uid(), nr: String(nr++), memberId: m.id, aar, tekst, belop: priceFor(m), forfall, status: 'ubetalt', createdAt: new Date().toISOString(), reminders: [] }));
+  const created = list.map(m => ({ id: uid(), nr: String(nr++), memberId: m.id, andre: m.andre || [], aar, tekst, kategori: priceCat(m) || '', belop: priceFor(m), forfall, status: 'ubetalt', createdAt: new Date().toISOString(), reminders: [] }));
   S.invoices.push(...created);
   clearTimeout(priceSaveT);
   await save({ invoices: S.invoices, settings: S.settings });
@@ -551,12 +588,12 @@ function renderInvoices() {
   if (st === 'ubetalt') list = list.filter(i => i.status !== 'betalt');
   if (st === 'forfalt') list = list.filter(i => i.status !== 'betalt' && i.forfall < today());
   if (st === 'betalt') list = list.filter(i => i.status === 'betalt');
-  if (q) list = list.filter(i => (fullName(byId[i.memberId] || {}) + ' ' + i.nr).toLowerCase().includes(q));
+  if (q) list = list.filter(i => (invNames(i) + ' ' + i.nr).toLowerCase().includes(q));
   list.sort((a, b) => (parseInt(b.nr) || 0) - (parseInt(a.nr) || 0));
   $('iTable').innerHTML = `<tr><th>Nr</th><th>Medlem</th><th class="hide-sm">Gjelder</th><th class="num">Beløp</th><th>Forfall</th><th class="hide-sm">Sendt</th><th class="hide-sm">Purret</th><th>Status</th><th>Betalt</th><th></th></tr>` +
     (list.map(i => { const m = byId[i.memberId] || {}; const n = (i.reminders || []).length; return `<tr>
-      <td>${esc(i.nr)}</td><td><b>${esc(fullName(m))}</b>${m.epost ? '' : ' <span class="status s-warn">uten e-post</span>'}</td>
-      <td class="hide-sm">${esc(i.tekst)}</td><td class="num">${kr(i.belop)}</td><td>${dato(i.forfall)}</td>
+      <td>${esc(i.nr)}</td><td><b>${esc(fullName(m))}</b>${(i.andre || []).length ? `<div class="muted">+ ${esc(invNames(i).split(', ').slice(1).join(', '))}</div>` : ''}${m.epost ? '' : ' <span class="status s-warn">uten e-post</span>'}</td>
+      <td class="hide-sm">${esc(i.tekst)}${i.kategori ? ` <span class="tag">${esc(i.kategori)}</span>` : ''}</td><td class="num">${kr(i.belop)}</td><td>${dato(i.forfall)}</td>
       <td class="hide-sm">${i.sentAt ? dato(i.sentAt) : '<span class="muted">Nei</span>'}</td>
       <td class="hide-sm">${n ? n + '× (sist ' + dato(i.reminders[n - 1]) + ')' : ''}</td>
       <td>${invStatus(i)}</td>
@@ -606,41 +643,68 @@ function printInvoice(id) {
   <div style="margin:40px 0 30px">${esc(fullName(m))}<br>${esc(m.adresse)}<br>${esc(m.postnr)} ${esc(m.sted)}</div>
   <h2>Faktura ${esc(i.nr)}</h2>
   <p style="white-space:pre-line">${esc(String(s.fakturaTekst || '').replace(/\{aar\}/g, i.aar).replace(/\{fornavn\}/g, m.fornavn || ''))}</p>
-  <table style="width:100%;border-collapse:collapse">${[['Gjelder', i.tekst], ['Beløp', kr(i.belop)], ['Forfall', dato(i.forfall)], ['Kontonummer', s.kontonr], ['Merk betalingen', 'Faktura ' + i.nr + ' – ' + fullName(m)]].concat(s.vipps ? [['Vipps', '#' + s.vipps]] : [])
+  <table style="width:100%;border-collapse:collapse">${[['Gjelder', i.tekst]].concat((i.andre || []).length ? [['Gjelder medlemmene', invNames(i)]] : []).concat(i.kategori ? [['Medlemskap', i.kategori + ' – ' + kr(i.belop)]] : []).concat([['Beløp', kr(i.belop)], ['Forfall', dato(i.forfall)], ['Kontonummer', s.kontonr], ['Merk betalingen', 'Faktura ' + i.nr + ' – ' + fullName(m)]]).concat(s.vipps ? [['Vipps', '#' + s.vipps]] : [])
     .map(r => `<tr><td style="padding:8px;border-bottom:1px solid #ddd">${esc(r[0])}</td><td style="padding:8px;border-bottom:1px solid #ddd"><b>${esc(r[1])}</b></td></tr>`).join('')}</table>
   <p style="white-space:pre-line;margin-top:30px">${esc(s.signatur)}</p><script>print()<\/script>`);
   w.document.close();
 }
 
 /* ───────── Utsendelse ───────── */
+let uMode = 'kat';
+const uPicked = new Set();
 function toggleUCat(c) { toggleSel(uCats, c); renderUtsendelse(); }
+function setUMode(m) { uMode = m; renderUtsendelse(); }
+function uRecipients() { return uMode === 'velg' ? S.members.filter(m => uPicked.has(m.id)) : membersIn(uCats); }
+function uVisible() {
+  const q = ($('uSearch').value || '').toLowerCase().trim(), c = $('uPickCat').value;
+  return S.members.filter(m => (!c || (m.kategorier || []).includes(c)) && (!q || (fullName(m) + ' ' + (m.epost || '')).toLowerCase().includes(q)))
+    .sort((a, b) => fullName(a).localeCompare(fullName(b), 'nb'));
+}
+function renderUPick() {
+  const cur = $('uPickCat').value;
+  $('uPickCat').innerHTML = `<option value="">Alle kategorier</option>` + allCats().map(c => `<option ${c === cur ? 'selected' : ''}>${esc(c)}</option>`).join('');
+  $('uPickTable').innerHTML = uVisible().map(m => `<tr><td style="width:36px"><input type="checkbox" style="width:18px;height:18px" ${uPicked.has(m.id) ? 'checked' : ''} onchange="pickOne('${m.id}', this.checked)" /></td>
+    <td><b>${esc(fullName(m))}</b></td><td>${m.epost ? esc(m.epost) : '<span class="status s-warn">Mangler e-post</span>'}</td>
+    <td class="hide-sm">${(m.kategorier || []).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</td></tr>`).join('') || '<tr><td class="muted" style="padding:14px">Ingen treff</td></tr>';
+  updateUCount();
+}
+function pickOne(id, on) { on ? uPicked.add(id) : uPicked.delete(id); updateUCount(); }
+function pickVisible(on) { if (on) uVisible().forEach(m => uPicked.add(m.id)); else uPicked.clear(); renderUPick(); }
+function updateUCount() {
+  const list = uRecipients(), med = list.filter(m => m.epost);
+  const adr = new Set(med.map(m => m.epost.toLowerCase())).size;
+  $('uCount').innerHTML = `<b>${med.length}</b> ${med.length === 1 ? 'mottaker' : 'mottakere'} med e-post` +
+    (adr < med.length ? ` – går til ${adr} ${adr === 1 ? 'e-postadresse' : 'e-postadresser'}, siden noen deler e-post` : '') +
+    (list.length - med.length ? ` · ${list.length - med.length} uten e-post får ikke meldingen` : '');
+}
 function renderUtsendelse() {
+  $('uModeKat').classList.toggle('on', uMode === 'kat'); $('uModeVelg').classList.toggle('on', uMode === 'velg');
+  $('uCats').classList.toggle('hidden', uMode !== 'kat'); $('uPick').classList.toggle('hidden', uMode !== 'velg');
   $('uCats').innerHTML = chipsHtml(uCats, true, 'toggleUCat');
-  const list = membersIn(uCats), med = list.filter(m => m.epost).length;
-  $('uCount').innerHTML = `<b>${med}</b> ${med === 1 ? 'mottaker' : 'mottakere'} med e-post` + (list.length - med ? ` · ${list.length - med} uten e-post får ikke meldingen` : '');
+  if (uMode === 'velg') renderUPick(); else updateUCount();
   $('logTable').innerHTML = `<tr><th>Dato</th><th>Type</th><th>Emne</th><th class="num">Sendt</th><th class="num">Feil</th></tr>` +
     ((S.log || []).map(l => `<tr><td>${new Date(l.at).toLocaleString('nb-NO', { dateStyle: 'short', timeStyle: 'short' })}</td>
       <td>${{ info: 'Info', invoice: 'Faktura', reminder: 'Purring' }[l.type] || l.type}</td><td>${esc(l.subject)}</td>
       <td class="num">${l.antall}</td><td class="num">${l.feil || ''}</td></tr>`).join('') || `<tr><td colspan="5" class="muted" style="padding:16px">Ingenting sendt ennå.</td></tr>`);
 }
 async function sendInfo() {
-  const list = membersIn(uCats).filter(m => m.epost);
+  const list = uRecipients().filter(m => m.epost);
   const subject = $('uSubject').value.trim(), body = $('uBody').value.trim();
   if (!subject || !body) return toast('Fyll inn emne og melding');
   if (!list.length) return toast('Ingen mottakere med e-post');
   if (!S.setup.mail) return toast('E-post er ikke satt opp ennå');
-  const hvem = uCats.has('__alle') ? 'alle medlemmer' : [...uCats].join(', ');
+  const hvem = uMode === 'velg' ? 'valgte medlemmer' : uCats.has('__alle') ? 'alle medlemmer' : [...uCats].join(', ');
   if (!confirm(`Sende «${subject}» til ${list.length} mottakere (${hvem})?`)) return;
   toast('Sender … ikke lukk siden', 60000);
   try {
     const r = await api('/api/send', { method: 'POST', body: JSON.stringify({ type: 'info', subject, body, memberIds: list.map(m => m.id) }) });
-    $('uSubject').value = ''; $('uBody').value = '';
+    $('uSubject').value = ''; $('uBody').value = ''; uPicked.clear();
     await load();
     toast(`Sendt til ${r.sendt} ${r.sendt === 1 ? 'mottaker' : 'mottakere'}.` + (r.feil.length ? ` ${r.feil.length} feilet.` : ''), 8000);
   } catch (e) { toast('Sending feilet: ' + e.message, 8000); }
 }
 function copyEmails() {
-  const list = membersIn(uCats).filter(m => m.epost).map(m => m.epost);
+  const list = [...new Set(uRecipients().filter(m => m.epost).map(m => m.epost.toLowerCase()))];
   navigator.clipboard.writeText(list.join('; ')).then(() => toast(`${list.length} adresser kopiert – lim inn i Bcc-feltet`));
 }
 
@@ -728,7 +792,7 @@ async function doImport() {
   const map = impMapping();
   const incoming = impRows.map(r => rowToMember(r, map)).filter(m => m.fornavn || m.etternavn || m.epost);
   let nye = 0, oppdatert = 0, nextNr = parseInt(nextMemberNr());
-  const key = m => m.epost || (fullName(m).toLowerCase());
+  const key = m => (m.epost || '') + '|' + fullName(m).toLowerCase();
   const existing = new Map(S.members.map(m => [key(m), m]));
   for (const inc of incoming) {
     const old = existing.get(key(inc));
@@ -755,7 +819,7 @@ function exportCsv() {
   const y = currentYear();
   const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const rows = S.members.map(m => {
-    const inv = S.invoices.filter(i => i.memberId === m.id && Number(i.aar) === y);
+    const inv = S.invoices.filter(i => invMembers(i).includes(m.id) && Number(i.aar) === y);
     const st = !inv.length ? 'Ikke fakturert' : inv.every(i => i.status === 'betalt') ? 'Betalt' : 'Ubetalt';
     return [m.nr, m.fornavn, m.etternavn, m.epost, m.telefon, m.adresse, m.postnr, m.sted, (m.kategorier || []).join(', '), m.innmeldt, m.notat, st].map(q).join(';');
   });

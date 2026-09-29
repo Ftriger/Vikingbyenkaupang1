@@ -136,6 +136,7 @@
           <input type="search" id="mSearch" autocomplete="off" name="kp-sok-medlem" class="grow" placeholder="Søk navn, e-post, telefon, sted …" oninput="renderMembers()" />
           <button class="btn" onclick="editMember()">+ Nytt medlem</button>
           <button class="btn ghost" onclick="exportCsv()">Last ned Excel/CSV</button>
+          <button class="btn ghost" id="dupBtn" onclick="openDuplicates()">Slå sammen duplikater</button>
         </div>
         <div class="chips" id="mCatFilter" style="margin-bottom:12px"></div>
         <div class="tw"><table id="mTable"></table></div>
@@ -301,6 +302,19 @@
   </div>
 </div>
 
+<!-- DUPLIKAT-MODAL -->
+<div class="modal-bg" id="dupModal">
+  <div class="modal" style="max-width:820px">
+    <h2>Duplikater</h2>
+    <p class="muted" style="margin-top:0">Medlemmer med samme navn. Velg hvem som skal beholdes – de andre slås inn i den. Tomme felt fylles ut, kategorier og notater slås sammen, og fakturaene flyttes over. Ingenting slettes før du trykker «Slå sammen».</p>
+    <div id="dupList"></div>
+    <div class="actions">
+      <button class="btn ghost" onclick="$('dupModal').classList.remove('open')">Lukk</button>
+      <button class="btn" id="dupAllBtn" onclick="mergeAllDups()">Slå sammen alle</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
@@ -422,6 +436,8 @@ function renderMembers() {
       <td class="hide-sm">${esc(m.telefon)}</td><td class="hide-sm">${esc(m.sted)}</td>
       <td>${(m.kategorier || []).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</td>
       <td>${memberStatus(m)}</td></tr>`).join('') || `<tr><td colspan="7" class="muted" style="padding:20px">Ingen medlemmer${S.members.length ? ' i utvalget' : ' ennå – bruk «Importer» eller «+ Nytt medlem»'}.</td></tr>`);
+  const nd = dupGroups().length;
+  $('dupBtn').textContent = nd ? `Slå sammen duplikater (${nd})` : 'Slå sammen duplikater';
   $('mCount').innerHTML = `Viser ${list.length} av ${S.members.length} medlemmer.` + (q ? ` <a href="#" onclick="$('mSearch').value='';renderMembers();return false">Tøm søk</a>` : '');
   const utenEpost = S.members.filter(m => !m.epost).length;
   const y = currentYear(), yi = S.invoices.filter(i => Number(i.aar) === y);
@@ -453,7 +469,74 @@ function renderMmCats() {
   $('mmCats').innerHTML = cats.map(c => `<span class="chip ${mmCats.has(c) ? 'on' : ''}" onclick="toggleMmCat('${esc(c).replace(/'/g, "\\'")}')">${esc(c)}</span>`).join('') || '<span class="muted">Lag kategorier under Innstillinger</span>';
 }
 function toggleMmCat(c) { mmCats.has(c) ? mmCats.delete(c) : mmCats.add(c); renderMmCats(); }
-function closeModal() { $('memberModal').classList.remove('open'); }
+function closeModal() { $('memberModal').classList.remove('open'); $('dupModal').classList.remove('open'); }
+
+/* ───────── Duplikater ───────── */
+const normName = m => fullName(m).toLowerCase().normalize('NFKC').replace(/[^a-zæøåäöü0-9]+/gi, ' ').trim();
+function dupGroups() {
+  const g = {};
+  for (const m of S.members) { const k = normName(m); if (k && k !== '(uten navn)') (g[k] = g[k] || []).push(m); }
+  return Object.values(g).filter(x => x.length > 1).map(list => list.slice().sort((a, b) => score(b) - score(a)));
+}
+function score(m) { return ['epost', 'telefon', 'adresse', 'postnr', 'sted', 'innmeldt'].filter(k => m[k]).length * 10 + (m.kategorier || []).length + (S.invoices.some(i => invMembers(i).includes(m.id)) ? 5 : 0); }
+function openDuplicates() {
+  renderDups();
+  $('dupModal').classList.add('open');
+}
+function renderDups() {
+  const groups = dupGroups();
+  $('dupAllBtn').style.display = groups.length ? '' : 'none';
+  $('dupList').innerHTML = groups.length ? groups.map((list, gi) => `
+    <div class="card" style="padding:12px;margin-bottom:12px">
+      <div class="row" style="margin-bottom:8px"><b class="grow">${esc(fullName(list[0]))} <span class="muted">(${list.length} stk)</span></b>
+        <button class="btn small" onclick="mergeGroup(${gi})">Slå sammen</button></div>
+      <div class="tw"><table><tr><th>Behold</th><th>Nr</th><th>E-post</th><th>Telefon</th><th>Adresse</th><th>Kategorier</th></tr>
+      ${list.map((m, i) => `<tr><td><input type="radio" name="dup${gi}" value="${m.id}" ${i === 0 ? 'checked' : ''} style="width:18px;height:18px" /></td>
+        <td>${esc(m.nr)}</td><td>${esc(m.epost)}</td><td>${esc(m.telefon)}</td><td>${esc([m.adresse, m.postnr, m.sted].filter(Boolean).join(', '))}</td>
+        <td>${(m.kategorier || []).map(c => `<span class="tag">${esc(c)}</span>`).join('')}</td></tr>`).join('')}
+      </table></div>
+      ${new Set(list.map(m => (m.epost || '').toLowerCase()).filter(Boolean)).size > 1 ? '<p class="notice warn" style="margin:8px 0 0">Obs: ulike e-postadresser – sjekk at dette faktisk er samme person. E-posten til den du beholder brukes, de andre legges i notatet.</p>' : ''}
+    </div>`).join('') : '<p class="notice ok">Fant ingen duplikater 👍</p>';
+}
+function mergeInto(keep, others) {
+  const felt = ['fornavn', 'etternavn', 'epost', 'telefon', 'adresse', 'postnr', 'sted', 'nr', 'innmeldt'];
+  const notat = [keep.notat];
+  for (const o of others) {
+    for (const k of felt) if (!keep[k] && o[k]) keep[k] = o[k];
+    if (o.innmeldt && keep.innmeldt && o.innmeldt < keep.innmeldt) keep.innmeldt = o.innmeldt;
+    if (parseInt(o.nr) && parseInt(keep.nr) && parseInt(o.nr) < parseInt(keep.nr)) keep.nr = o.nr; // behold eldste medlemsnummer
+    keep.kategorier = [...new Set([...(keep.kategorier || []), ...(o.kategorier || [])])];
+    if (o.notat) notat.push(o.notat);
+    if (o.epost && keep.epost && o.epost.toLowerCase() !== keep.epost.toLowerCase()) notat.push('Annen e-post: ' + o.epost);
+    if (o.telefon && keep.telefon && o.telefon !== keep.telefon) notat.push('Annen telefon: ' + o.telefon);
+    for (const i of S.invoices) {
+      if (i.memberId === o.id) i.memberId = keep.id;
+      if (i.andre) i.andre = [...new Set(i.andre.map(x => x === o.id ? keep.id : x))].filter(x => x !== i.memberId);
+    }
+  }
+  keep.notat = [...new Set(notat.filter(Boolean))].join('\n');
+  const ids = new Set(others.map(o => o.id));
+  S.members = S.members.filter(m => !ids.has(m.id));
+}
+function pickedGroup(gi) {
+  const list = dupGroups()[gi];
+  const id = (document.querySelector(`input[name=dup${gi}]:checked`) || {}).value || list[0].id;
+  return { keep: list.find(m => m.id === id), others: list.filter(m => m.id !== id) };
+}
+async function mergeGroup(gi) {
+  const { keep, others } = pickedGroup(gi);
+  mergeInto(keep, others);
+  await save({ members: S.members, invoices: S.invoices });
+  renderAll(); renderDups(); toast(`Slått sammen: ${fullName(keep)}`);
+}
+async function mergeAllDups() {
+  const groups = dupGroups();
+  if (!confirm(`Slå sammen ${groups.length} grupper med duplikater?`)) return;
+  const picks = groups.map((_, gi) => pickedGroup(gi));
+  picks.forEach(({ keep, others }) => mergeInto(keep, others));
+  await save({ members: S.members, invoices: S.invoices });
+  renderAll(); renderDups(); toast(`${picks.length} grupper slått sammen`);
+}
 function nextMemberNr() { return String(S.members.reduce((mx, m) => Math.max(mx, parseInt(m.nr) || 0), 0) + 1); }
 async function saveMember() {
   const data = {};
@@ -882,6 +965,7 @@ async function removeCat(c) {
 
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 $('memberModal').addEventListener('click', e => { if (e.target.id === 'memberModal') closeModal(); });
+$('dupModal').addEventListener('click', e => { if (e.target.id === 'dupModal') closeModal(); });
 load();
 </script>
 </body>

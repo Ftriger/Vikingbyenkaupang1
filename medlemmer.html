@@ -375,10 +375,11 @@ document.querySelectorAll('nav.tabs button').forEach(b => b.onclick = () => {
 function renderAll() { renderMembers(); renderInvoiceForm(); renderInvoices(); renderUtsendelse(); renderSettings(); }
 
 /* ───────── Kategorier ───────── */
+const FASTE = ['Styret'];
 function allCats() {
-  const set = new Set(S.categories || []);
+  const set = new Set([...FASTE, ...(S.categories || [])]);
   S.members.forEach(m => (m.kategorier || []).forEach(c => set.add(c)));
-  return [...set].sort((a, b) => a.localeCompare(b, 'nb'));
+  return [...set].sort((a, b) => (FASTE.includes(b) - FASTE.includes(a)) || a.localeCompare(b, 'nb'));
 }
 function catCount(c) { return S.members.filter(m => (m.kategorier || []).includes(c)).length; }
 function chipsHtml(selected, withAll, onclick) {
@@ -688,10 +689,18 @@ function renderUtsendelse() {
   $('uCats').classList.toggle('hidden', uMode !== 'kat'); $('uPick').classList.toggle('hidden', uMode !== 'velg');
   $('uCats').innerHTML = chipsHtml(uCats, true, 'toggleUCat');
   if (uMode === 'velg') renderUPick(); else updateUCount();
-  $('logTable').innerHTML = `<tr><th>Dato</th><th>Type</th><th>Emne</th><th class="num">Sendt</th><th class="num">Feil</th></tr>` +
-    ((S.log || []).map(l => `<tr><td>${new Date(l.at).toLocaleString('nb-NO', { dateStyle: 'short', timeStyle: 'short' })}</td>
+  const mottakere = l => {
+    if (l.label) return esc(l.label);
+    const n = l.navn || [];
+    if (!n.length) return '<span class="muted">–</span>';
+    const kort = n.slice(0, 4).join(', ') + (n.length > 4 ? ` + ${n.length - 4} til` : '');
+    return `<span title="${esc(n.join(', '))}">${esc(kort)}</span>`;
+  };
+  $('logTable').innerHTML = `<tr><th>Dato</th><th>Type</th><th>Emne</th><th>Sendt til</th><th class="num">Antall</th><th class="num">Feil</th></tr>` +
+    ((S.log || []).map(l => `<tr><td style="white-space:nowrap">${new Date(l.at).toLocaleString('nb-NO', { dateStyle: 'short', timeStyle: 'short' })}</td>
       <td>${{ info: 'Info', invoice: 'Faktura', reminder: 'Purring' }[l.type] || l.type}</td><td>${esc(l.subject)}</td>
-      <td class="num">${l.antall}</td><td class="num">${l.feil || ''}</td></tr>`).join('') || `<tr><td colspan="5" class="muted" style="padding:16px">Ingenting sendt ennå.</td></tr>`);
+      <td>${mottakere(l)}</td>
+      <td class="num">${l.antall}</td><td class="num">${l.feil || ''}</td></tr>`).join('') || `<tr><td colspan="6" class="muted" style="padding:16px">Ingenting sendt ennå.</td></tr>`);
 }
 async function sendInfo() {
   const list = uRecipients().filter(m => m.epost);
@@ -703,7 +712,7 @@ async function sendInfo() {
   if (!confirm(`Sende «${subject}» til ${list.length} mottakere (${hvem})?`)) return;
   toast('Sender … ikke lukk siden', 60000);
   try {
-    const r = await api('/api/send', { method: 'POST', body: JSON.stringify({ type: 'info', subject, body, memberIds: list.map(m => m.id) }) });
+    const r = await api('/api/send', { method: 'POST', body: JSON.stringify({ type: 'info', subject, body, memberIds: list.map(m => m.id), label: uMode === 'velg' ? '' : (uCats.has('__alle') ? 'Alle medlemmer' : [...uCats].join(', ')) }) });
     $('uSubject').value = ''; $('uBody').value = ''; uPicked.clear();
     await load();
     toast(`Sendt til ${r.sendt} ${r.sendt === 1 ? 'mottaker' : 'mottakere'}.` + (r.feil.length ? ` ${r.feil.length} feilet.` : ''), 8000);
@@ -863,6 +872,7 @@ async function renameCat(c) {
   await save({ members: S.members, categories: S.categories, settings: S.settings }); renderAll();
 }
 async function removeCat(c) {
+  if (FASTE.includes(c)) return toast('«' + c + '» er en fast kategori og kan ikke slettes');
   const n = catCount(c);
   if (!confirm(`Slette kategorien «${c}»?${n ? ` Den fjernes fra ${n} medlemmer (medlemmene slettes ikke).` : ''}`)) return;
   S.members.forEach(m => m.kategorier = (m.kategorier || []).filter(x => x !== c));

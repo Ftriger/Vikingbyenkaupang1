@@ -65,7 +65,7 @@ module.exports = async (req, res) => {
       if (seen.has(adr)) continue; // familie med felles e-post får én e-post
       seen.add(adr);
       const txt = fyll(body.body, m);
-      msgs.push({
+      msgs.push({ _navn: [m.fornavn, m.etternavn].filter(Boolean).join(' '),
         to: m.epost, subject: fyll(body.subject, m),
         text: txt + '\n\n' + settings.signatur,
         html: wrapHtml(settings, `<p style="white-space:pre-line">${esc(txt)}</p>`),
@@ -86,13 +86,13 @@ module.exports = async (req, res) => {
       }
       targets.push(inv);
       if (!m.epost) { utenEpost.push(m.id); continue; }
-      msgs.push({ ...fakturaMail(settings, m, inv, purring, byId), _inv: inv.id });
+      msgs.push({ ...fakturaMail(settings, m, inv, purring, byId), _inv: inv.id, _navn: [m.fornavn, m.etternavn].filter(Boolean).join(' ') });
     }
   } else {
     return send(res, 400, { error: 'Ukjent type' });
   }
 
-  const results = msgs.length ? await sendMails(msgs.map(({ _inv, ...m }) => m)) : [];
+  const results = msgs.length ? await sendMails(msgs.map(({ _inv, _navn, ...m }) => m)) : [];
   const okTo = new Set(results.filter(r => r.ok).map(r => r.to));
 
   if (body.type !== 'info') {
@@ -110,6 +110,8 @@ module.exports = async (req, res) => {
   log.unshift({
     at: now, type: body.type, subject: body.subject || (body.type === 'invoice' ? 'Faktura' : 'Purring'),
     antall: sendt, feil: feil.length, utenEpost: utenEpost.length,
+    label: typeof body.label === 'string' ? body.label.slice(0, 200) : '',
+    navn: [...new Set(msgs.filter(m => okTo.has(m.to)).map(m => m._navn))].filter(Boolean).slice(0, 300),
   });
   await setJSON('log', log.slice(0, 200));
 

@@ -1,4 +1,5 @@
 const { isAuthed, dbConfig, getJSON, setJSON, mailConfigured, readBody, send } = require('./_lib');
+const { status } = require('./_queue');
 
 const DEFAULT_SETTINGS = {
   orgName: 'Kaupangprosjektet',
@@ -27,13 +28,13 @@ async function handle(req, res) {
   if (!dbConfig()) return send(res, 200, { setup: { db: false, mail: mailConfigured() } });
 
   if (req.method === 'GET') {
-    const [members, invoices, settings, categories, log] = await Promise.all([
+    const [members, invoices, settings, categories, log, ko] = await Promise.all([
       getJSON('members', []), getJSON('invoices', []), getJSON('settings', {}),
-      getJSON('categories', []), getJSON('log', []),
+      getJSON('categories', []), getJSON('log', []), status(),
     ]);
     return send(res, 200, {
       setup: { db: true, mail: mailConfigured() },
-      members, invoices, categories, log,
+      members, invoices, categories, log, ko,
       settings: { ...DEFAULT_SETTINGS, ...settings },
     });
   }

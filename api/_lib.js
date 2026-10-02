@@ -137,6 +137,6 @@ function esc(s) {
 }
 
 module.exports = {
-  dbConfig, getJSON, setJSON, sign, verify, isAuthed, checkPassword,
+  dbConfig, redis, getJSON, setJSON, sign, verify, isAuthed, checkPassword,
   mailConfigured, sendMails, readBody, send, esc,
 };

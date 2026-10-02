@@ -331,6 +331,8 @@ const dato = d => d ? new Date(d).toLocaleDateString('nb-NO') : '';
 const today = () => new Date().toISOString().slice(0, 10);
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
 const fullName = m => [m.fornavn, m.etternavn].filter(Boolean).join(' ') || '(uten navn)';
+const klokke = iso => iso ? new Date(iso).toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit' }) : '';
+function koTekst(r) { return r.iKo ? ` ${r.iKo} ligger i kø og sendes automatisk${r.nesteBolk ? ' fra kl. ' + klokke(r.nesteBolk) : ''} (e-postserveren tillater 60 i timen). Siden trenger ikke være åpen.` : ''; }
 function toast(msg, ms = 3500) { const t = $('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', ms); }
 
 /* ───────── API ───────── */
@@ -373,10 +375,21 @@ function renderSetup() {
   let h = '';
   if (!st.db) h += `<div class="notice bad"><b>Databasen er ikke koblet til ennå.</b> Ingenting kan lagres før dette er gjort – se Innstillinger → Oppsett.</div>`;
   else if (!st.mail) h += `<div class="notice warn"><b>E-post er ikke satt opp ennå.</b> Du kan registrere medlemmer og fakturaer, men ikke sende e-post. Se Innstillinger → Oppsett.</div>`;
+  const ko = S.ko || {};
+  if (ko.iKo) h += `<div class="notice warn"><b>${ko.iKo} e-poster ligger i utsendingskøen.</b> De sendes automatisk i bolker på ${ko.grense || 60}${ko.nesteBolk ? ', neste bolk fra kl. ' + klokke(ko.nesteBolk) : ''}. Du trenger ikke holde siden åpen.</div>`;
   $('setupNotice').innerHTML = h;
+  clearTimeout(window._koT);
+  if (ko.iKo) window._koT = setTimeout(pollKo, 120000);
   $('setupStatus').innerHTML = `
     <p>${st.db ? '✅' : '❌'} Database ${st.db ? 'tilkoblet' : '<b>mangler</b> – i Vercel: Storage → Create Database → Upstash for Redis (velg region Frankfurt) → Connect to project.'}</p>
     <p>${st.mail ? '✅' : '❌'} E-post ${st.mail ? 'satt opp' : '<b>mangler</b> – legg inn SMTP_HOST, SMTP_USER, SMTP_PASS (fra e-postleverandøren til post@kaupangprosjektet.no) under Settings → Environment Variables i Vercel.'}</p>`;
+}
+
+async function pollKo() {
+  try { await fetch('/api/queue'); } catch {}
+  const typing = document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) && !$('app').classList.contains('hidden');
+  if (typing || document.querySelector('.modal-bg.open')) { window._koT = setTimeout(pollKo, 60000); return; }
+  await load();
 }
 
 /* ───────── Faner ───────── */
@@ -653,10 +666,11 @@ async function sendInvoices(type, ids) {
   try {
     const r = await api('/api/send', { method: 'POST', body: JSON.stringify({ type, invoiceIds: ids }) });
     await load();
-    let msg = `Sendt ${r.sendt} e-post.`;
+    let msg = `Sendt ${r.sendt} e-post nå.`;
     if (r.utenEpost.length) msg += ` ${r.utenEpost.length} uten e-post.`;
     if (r.feil.length) msg += ` ${r.feil.length} feilet: ${r.feil.slice(0, 3).map(f => f.to).join(', ')}`;
-    toast(msg, 8000);
+    msg += koTekst(r);
+    toast(msg, r.iKo ? 15000 : 8000);
   } catch (e) { toast('Sending feilet: ' + e.message, 8000); }
 }
 
@@ -683,12 +697,12 @@ function renderInvoices() {
     (list.map(i => { const m = byId[i.memberId] || {}; const n = (i.reminders || []).length; return `<tr>
       <td>${esc(i.nr)}</td><td><b>${esc(fullName(m))}</b>${(i.andre || []).length ? `<div class="muted">+ ${esc(invNames(i).split(', ').slice(1).join(', '))}</div>` : ''}${m.epost ? '' : ' <span class="status s-warn">uten e-post</span>'}</td>
       <td class="hide-sm">${esc(i.tekst)}${invKat(i) ? ` <span class="tag">${esc(invKat(i))}</span>` : ''}</td><td class="num">${kr(i.belop)}</td><td>${dato(i.forfall)}</td>
-      <td class="hide-sm">${i.sentAt ? dato(i.sentAt) : '<span class="muted">Nei</span>'}</td>
+      <td class="hide-sm">${i.queuedAt ? '<span class="status s-warn">I kø</span>' : i.sentAt ? dato(i.sentAt) : '<span class="muted">Nei</span>'}</td>
       <td class="hide-sm">${n ? n + '× (sist ' + dato(i.reminders[n - 1]) + ')' : ''}</td>
       <td>${invStatus(i)}</td>
       <td><label class="paid-toggle"><input type="checkbox" ${i.status === 'betalt' ? 'checked' : ''} onchange="togglePaid('${i.id}', this.checked)" /></label></td>
       <td style="white-space:nowrap">
-        ${i.status !== 'betalt' && m.epost ? `<button class="btn ghost small" onclick="${i.sentAt ? `remindOne('${i.id}')">Purr` : `sendInvoices('invoice',['${i.id}'])">Send`}</button>` : ''}
+        ${i.status !== 'betalt' && m.epost && !i.queuedAt ? `<button class="btn ghost small" onclick="${i.sentAt ? `remindOne('${i.id}')">Purr` : `sendInvoices('invoice',['${i.id}'])">Send`}</button>` : ''}
         <button class="btn ghost small" onclick="printInvoice('${i.id}')" title="Skriv ut">🖨</button>
         <button class="btn ghost small" onclick="deleteInvoice('${i.id}')" title="Slett">✕</button>
       </td></tr>`; }).join('') || `<tr><td colspan="10" class="muted" style="padding:20px">Ingen fakturaer.</td></tr>`);
@@ -783,7 +797,7 @@ function renderUtsendelse() {
     ((S.log || []).map(l => `<tr><td style="white-space:nowrap">${new Date(l.at).toLocaleString('nb-NO', { dateStyle: 'short', timeStyle: 'short' })}</td>
       <td>${{ info: 'Info', invoice: 'Faktura', reminder: 'Purring' }[l.type] || l.type}</td><td>${esc(l.subject)}</td>
       <td>${mottakere(l)}</td>
-      <td class="num">${l.antall}</td><td class="num">${l.feil || ''}</td></tr>`).join('') || `<tr><td colspan="6" class="muted" style="padding:16px">Ingenting sendt ennå.</td></tr>`);
+      <td class="num">${l.antall}${l.iKo ? ` <span class="muted" style="white-space:nowrap">+ ${l.iKo} i kø</span>` : ''}</td><td class="num">${l.feil || ''}</td></tr>`).join('') || `<tr><td colspan="6" class="muted" style="padding:16px">Ingenting sendt ennå.</td></tr>`);
 }
 async function sendInfo() {
   const list = uRecipients().filter(m => m.epost);
@@ -798,7 +812,7 @@ async function sendInfo() {
     const r = await api('/api/send', { method: 'POST', body: JSON.stringify({ type: 'info', subject, body, memberIds: list.map(m => m.id), label: uMode === 'velg' ? '' : (uCats.has('__alle') ? 'Alle medlemmer' : [...uCats].join(', ')) }) });
     $('uSubject').value = ''; $('uBody').value = ''; uPicked.clear();
     await load();
-    toast(`Sendt til ${r.sendt} ${r.sendt === 1 ? 'mottaker' : 'mottakere'}.` + (r.feil.length ? ` ${r.feil.length} feilet.` : ''), 8000);
+    toast(`Sendt til ${r.sendt} ${r.sendt === 1 ? 'mottaker' : 'mottakere'} nå.` + (r.feil.length ? ` ${r.feil.length} feilet.` : '') + koTekst(r), r.iKo ? 15000 : 8000);
   } catch (e) { toast('Sending feilet: ' + e.message, 8000); }
 }
 function copyEmails() {

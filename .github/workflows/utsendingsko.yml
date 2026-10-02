@@ -1,0 +1,11 @@
+# Sender neste bolk fra medlemsregisterets e-postkø hvert 10. minutt.
+name: Utsendingskø
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -fsS --max-time 60 https://vikingbyenkaupang1-ipf8.vercel.app/api/queue || true

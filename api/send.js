@@ -1,4 +1,6 @@
-const { isAuthed, dbConfig, getJSON, setJSON, mailConfigured, sendMails, readBody, send, esc } = require('./_lib');
+const { isAuthed, dbConfig, getJSON, setJSON, mailConfigured, readBody, send, esc } = require('./_lib');
+const { enqueue, processQueue } = require('./_queue');
+const crypto = require('crypto');
 
 const kr = n => Number(n || 0).toLocaleString('nb-NO', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' kr';
 const dato = d => d ? new Date(d).toLocaleDateString('nb-NO', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
@@ -95,28 +97,32 @@ module.exports = async (req, res) => {
     return send(res, 400, { error: 'Ukjent type' });
   }
 
-  const results = msgs.length ? await sendMails(msgs.map(({ _inv, _navn, ...m }) => m)) : [];
-  const okTo = new Set(results.filter(r => r.ok).map(r => r.to));
-
-  if (body.type !== 'info') {
-    const sentInv = new Set(msgs.filter(m => okTo.has(m.to)).map(m => m._inv));
-    for (const inv of invoices) {
-      if (!sentInv.has(inv.id)) continue;
-      if (body.type === 'invoice') inv.sentAt = now;
-      else inv.reminders = [...(inv.reminders || []), now];
-    }
-    await setJSON('invoices', invoices);
-  }
-
-  const sendt = results.filter(r => r.ok).length;
-  const feil = results.filter(r => !r.ok);
+  // Alt legges i utsendingskøen. Så mye som e-postserveren tillater sendes med en gang,
+  // resten sendes automatisk i neste bolk.
+  const logId = crypto.randomUUID();
   log.unshift({
-    at: now, type: body.type, subject: body.subject || (body.type === 'invoice' ? 'Faktura' : 'Purring'),
-    antall: sendt, feil: feil.length, utenEpost: utenEpost.length,
+    id: logId, at: now, type: body.type, subject: body.subject || (body.type === 'invoice' ? 'Faktura' : 'Purring'),
+    antall: 0, feil: 0, utenEpost: utenEpost.length, iKo: msgs.length,
     label: typeof body.label === 'string' ? body.label.slice(0, 200) : '',
-    navn: [...new Set(msgs.filter(m => okTo.has(m.to)).map(m => m._navn))].filter(Boolean).slice(0, 300),
+    navn: [],
   });
   await setJSON('log', log.slice(0, 200));
+  if (body.type !== 'info') {
+    const ids = new Set(msgs.map(m => m._inv));
+    for (const inv of invoices) if (ids.has(inv.id)) inv.queuedAt = now;
+    await setJSON('invoices', invoices);
+  }
+  await enqueue(msgs.map(({ _inv, _navn, ...m }) => ({ ...m, kind: body.type, invId: _inv || null, navn: _navn || '', logId })));
 
-  send(res, 200, { sendt, feil, utenEpost });
+  const t0 = Date.now();
+  let r = { sendt: [], feil: [], iKo: msgs.length, nesteBolk: null }, mine = 0, feil = [];
+  try {
+    do {
+      r = await processQueue();
+      mine += r.sendt.filter(j => j.logId === logId).length;
+      feil = feil.concat(r.feil);
+    } while (r.sendt.length && r.iKo && Date.now() - t0 < 30000);
+  } catch (e) { /* ligger i kø og sendes ved neste kjøring */ }
+  const iKo = (await getJSON('mailQueue', [])).filter(j => j.logId === logId).length;
+  send(res, 200, { sendt: mine, feil, utenEpost, iKo, nesteBolk: r.nesteBolk });
 };

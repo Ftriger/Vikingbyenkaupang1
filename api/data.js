@@ -6,7 +6,7 @@ const DEFAULT_SETTINGS = {
   kontonr: '',
   vipps: '',
   orgnr: '',
-  signatur: 'Med vennlig hilsen\nKaupangprosjektet\npost@kaupangprosjektet.no',
+  signatur: 'Med vennlig hilsen\nKaupangprosjektet\nmedlem@kaupangprosjektet.no',
   fakturaTekst: 'Takk for at du er medlem i Kaupangprosjektet! Her er faktura for medlemskontingent {aar}.',
   purreTekst: 'Vi kan ikke se å ha mottatt betaling for medlemskontingent {aar}. Dersom du allerede har betalt, kan du se bort fra denne påminnelsen.',
   priser: {},

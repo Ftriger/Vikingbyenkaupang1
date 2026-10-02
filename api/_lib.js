@@ -74,7 +74,7 @@ function mailConfigured() {
   return !!(process.env.SMTP_HOST || process.env.RESEND_API_KEY);
 }
 function fromAddress() {
-  return process.env.MAIL_FROM || process.env.SMTP_USER || 'post@kaupangprosjektet.no';
+  return process.env.MAIL_FROM || process.env.SMTP_USER || 'medlem@kaupangprosjektet.no';
 }
 
 // msgs: [{to, subject, text, html}]

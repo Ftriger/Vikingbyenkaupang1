@@ -17,8 +17,11 @@ function wrapHtml(settings, inner) {
 
 function fakturaMail(settings, m, inv, purring, byIdAll = {}) {
   const navn = [m.fornavn, m.etternavn].filter(Boolean).join(' ');
-  const intro = fyll(purring ? settings.purreTekst : settings.fakturaTekst, m, inv);
+  // Teksten fra Innstillinger kan selv starte med «Hei!» – fjern den, så det ikke blir dobbel hilsen
+  const intro = fyll(purring ? settings.purreTekst : settings.fakturaTekst, m, inv).replace(/^\s*hei[^\n!.,]{0,40}[!.,]?\s*/i, '');
+  const hilsen = `Hei ${m.fornavn || navn}!`;
   const tittel = purring ? `Påminnelse: faktura ${inv.nr}` : `Faktura ${inv.nr}`;
+  const merk = m.nr ? `${navn} – medlemsnr. ${m.nr}` : `${navn} – faktura ${inv.nr}`;
   const alle = [m, ...((inv.andre || []).map(id => byIdAll[id]).filter(Boolean))];
   const rader = [
     ['Fakturanr.', inv.nr],
@@ -29,11 +32,11 @@ function fakturaMail(settings, m, inv, purring, byIdAll = {}) {
     ...(inv.kategori ? [['Medlemskap', `${inv.kategori} – ${kr(inv.belop)}`]] : []),
     ['Beløp', kr(inv.belop)],
     ['Forfall', dato(inv.forfall)], ['Kontonummer', settings.kontonr || '—'],
-    ['Merk betalingen', `Faktura ${inv.nr} – ${navn}`],
+    ['Merk betalingen', merk],
   ];
-  if (settings.vipps) rader.push(['Vipps', `#${settings.vipps} – merk med faktura ${inv.nr}`]);
-  const text = `Hei ${m.fornavn || navn}!\n\n${intro}\n\n` + rader.map(r => `${r[0]}: ${r[1]}`).join('\n') + `\n\n${settings.signatur}`;
-  const html = wrapHtml(settings, `<p>Hei ${esc(m.fornavn || navn)}!</p><p style="white-space:pre-line">${esc(intro)}</p>
+  if (settings.vipps) rader.push(['Vipps', `#${settings.vipps} – merk med ${merk}`]);
+  const text = `${hilsen}\n\n${intro}\n\n` + rader.map(r => `${r[0]}: ${r[1]}`).join('\n') + `\n\n${settings.signatur}`;
+  const html = wrapHtml(settings, `<p>${esc(hilsen)}</p><p style="white-space:pre-line">${esc(intro)}</p>
     <h2 style="font-size:18px;margin:20px 0 8px">${esc(tittel)}</h2>
     <table style="border-collapse:collapse;width:100%">${rader.map(r =>
       `<tr><td style="padding:6px 8px;border-bottom:1px solid #EDE0C4;color:#6B5F55">${esc(r[0])}</td><td style="padding:6px 8px;border-bottom:1px solid #EDE0C4;font-weight:bold">${esc(r[1])}</td></tr>`).join('')}</table>`);
